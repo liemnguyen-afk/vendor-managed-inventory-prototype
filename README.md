@@ -1,6 +1,10 @@
 # Vendor Managed Inventory — clickable HTML prototype
 
-A static, clickable prototype of **Vendor Managed Inventory**. Open [`index.html`](index.html) to start.
+A static, clickable prototype of **Vendor Managed Inventory**.
+
+**▶ View the live prototype: https://liemnguyen-afk.github.io/vendor-managed-inventory-prototype/**
+
+To run it locally, open [`index.html`](index.html).
 
 No build step: plain HTML, CSS and JavaScript.
 
