@@ -11,6 +11,58 @@ const ICONS = {
   translate: '<svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="#2f2f2f" stroke-width="1.2"><rect x="1.5" y="1.5" width="11" height="11"/><rect x="7.5" y="7.5" width="11" height="11" fill="#fff"/><path d="M4 9.5L7 4l3 5.5M5 8h4M10.5 11h5M13 9.5v1.5M15 11c-.5 2.5-2.5 4.5-4.5 5M11.5 13c1 1.5 2.5 2.7 4 3.2"/></svg>',
 };
 
+/* ---------------------------------------------------------------- Prototype navigator
+ * Bottom-left "Prototype ▾" toggle: jump to any screen, switch between the supplier and buyer views of
+ * the same stock, or reset the sample data. Reviewer tool — not part of the product UI. */
+const PROTO_SCREENS = [
+  ['CSP — Supplier (Ines Ellis, Northwind Supply Co.)', [
+    ['supplier-items.html', 'Items'],
+    ['supplier-stock-location.html', 'Stock Location (inline edit)'],
+    ['supplier-bulk-load.html?from=stock-location', 'Bulk Load Inventory Balance'],
+  ]],
+  ['Enterprise — Buyer (Buyer Demo Company)', [
+    ['ohb.html', 'On-Hand Balances'],
+    ['ohb-vendor-stock.html', 'Vendor Stock Balances'],
+    ['inventory-settings.html', 'Inventory Settings'],
+    ['warehouse.html', 'Warehouse — Laughlin Nevada'],
+    ['warehouse-create.html', 'Create Warehouse'],
+  ]],
+];
+// Same data, other side
+const PROTO_COUNTERPART = {
+  'supplier-stock-location.html': ['ohb-vendor-stock.html', 'Switch to Buyer: Vendor Stock Balances'],
+  'supplier-items.html': ['ohb.html', 'Switch to Buyer: On-Hand Balances'],
+  'supplier-bulk-load.html': ['ohb-vendor-stock.html', 'Switch to Buyer: Vendor Stock Balances'],
+  'ohb-vendor-stock.html': ['supplier-stock-location.html', 'Switch to Supplier: Stock Location'],
+  'ohb.html': ['supplier-items.html', 'Switch to Supplier: Items'],
+};
+function renderProtoNav() {
+  if (document.querySelector('.proto')) return;
+  const here = location.pathname.split('/').pop() || 'index.html';
+  const other = PROTO_COUNTERPART[here];
+  document.body.insertAdjacentHTML('beforeend', `
+  <div class="proto">
+    <div class="panel" id="proto-panel" role="dialog" aria-label="Prototype navigator">
+      ${other ? `<a class="switch" href="${other[0]}">⇄ ${esc(other[1])}</a>` : ''}
+      ${PROTO_SCREENS.map(([group, items]) => `<h4>${esc(group)}</h4>${items.map(([href, label]) =>
+        `<a href="${href}" class="${href.split('?')[0] === here ? 'here' : ''}" ${href.split('?')[0] === here ? 'aria-current="page"' : ''}>${esc(label)}</a>`).join('')}`).join('')}
+      <h4>Data</h4>
+      <button type="button" data-proto-reset>Reset sample data</button>
+    </div>
+    <button type="button" class="proto-toggle" aria-expanded="false" aria-controls="proto-panel">Prototype ▾</button>
+  </div>`);
+  const root = document.querySelector('.proto'), toggle = root.querySelector('.proto-toggle');
+  const set = open => { root.classList.toggle('open', open); toggle.setAttribute('aria-expanded', String(open)); };
+  toggle.addEventListener('click', () => set(!root.classList.contains('open')));
+  document.addEventListener('click', e => { if (!root.contains(e.target)) set(false); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') set(false); });
+  root.querySelector('[data-proto-reset]').addEventListener('click', () => {
+    Object.keys(localStorage).filter(k => k.startsWith('vmi.')).forEach(k => localStorage.removeItem(k));
+    sessionStorage.removeItem('vmi.flash');
+    location.reload();
+  });
+}
+
 /* ---------------------------------------------------------------- Global header */
 // theme 'white': search bar + white nav (Inventory Settings screengrab).
 // theme 'blue': classic blue nav band, no search, no apps button (Warehouse screengrab).
@@ -29,6 +81,7 @@ const SUB_LINKS = {
 };
 
 function renderHeader({ primary = 'Setup', theme = 'white', sub = null } = {}) {
+  queueMicrotask(renderProtoNav);
   const subLinks = SUB_LINKS[primary] || SUB_LINKS.Setup;
   const link = (label, selected) => HEADER_HREF[label]
     ? `<a href="${HEADER_HREF[label]}" class="${selected ? 'selected' : ''}" ${selected ? 'aria-current="page"' : ''}>${esc(label)}</a>`
@@ -72,6 +125,7 @@ const CSP_ICONS = {
 const CSP_TABS = [['Items', 'supplier-items.html']];
 
 function renderCspHeader({ primary = 'Items', tab = 'Items' } = {}) {
+  queueMicrotask(renderProtoNav);
   const links = ['Invoices', 'Orders', 'Agreements', 'Business Profile', 'Dashboards', 'Payments', 'Service Sheets',
     'Items', 'ASN', 'Sourcing', 'Setup'];
   const link = l => `<a href="${l === primary ? '#' : '#'}" ${l === primary ? 'aria-current="page"' : 'data-stub'} class="${l === primary ? 'selected' : ''}">${esc(l)}</a>`;
