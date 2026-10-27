@@ -419,3 +419,9 @@ body.csp-page main { flex: 1; }
 .page-tabs.ent a.selected { color: var(--hdr-subnav-selected); border-bottom-color: var(--hdr-subnav-selected); font-weight: var(--cui-font-weight-regular); }
 .tab-intro { margin: -8px 0 var(--cui-space-2xl); font-size: var(--cui-font-size-sm); color: var(--cui-color-text-t2); }
 body.ent-page .classic-foot { margin-top: 40px; }
+
+/* Info banner (Clarity Alert · Info · Outlined) — Vendor Stock Balances */
+.info-banner { display: flex; align-items: center; gap: var(--cui-space-lg); margin: 0 0 var(--cui-space-4xl); padding: var(--cui-space-lg) var(--cui-space-2xl); border: 1px solid var(--cui-color-primary-surface-rest); border-radius: var(--cui-radii-2xs); background: var(--cui-color-s1-surface-rest); color: var(--cui-color-primary-surface-rest); font-size: var(--cui-font-size-sm); line-height: var(--cui-font-lineHeight-2xs); }
+.info-banner svg { flex: none; }
+.info-banner p { margin: 0; }
+.info-banner b { font-weight: var(--cui-font-weight-bold); color: var(--cui-color-text-subtle-brand); }
