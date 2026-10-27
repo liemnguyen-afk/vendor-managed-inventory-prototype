@@ -1,0 +1,13 @@
+apiVersion: Backstage.io/v1alpha1
+kind: Component
+metadata:
+  description: Vendor Managed Inventory clickable HTML prototype (Enterprise buyer + Supplier Portal flows). Static design prototype, not production code.
+  labels:
+    jiraComponents: UX
+    jiraDevTeam: UX
+    jiraProject: CD
+    sastTool: None
+  name: vendor-managed-inventory-prototype
+spec:
+  lifecycle: experimental
+  type: website
