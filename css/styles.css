@@ -436,3 +436,7 @@ body.ent-page .classic-foot { margin-top: 40px; }
 .proto-nav .panel a:hover, .proto-nav .panel button:hover { background: var(--cui-color-s1-surface-hover); text-decoration: none; }
 .proto-nav .panel a.here { background: var(--cui-color-s1-surface-selectedSubtle); color: var(--cui-color-primary-surface-rest); font-weight: var(--cui-font-weight-semiBold); }
 .proto-nav .panel a.switch { margin-bottom: var(--cui-space-2xs); border: 1px solid var(--cui-color-primary-surface-rest); color: var(--cui-color-primary-surface-rest); font-weight: var(--cui-font-weight-semiBold); text-align: center; }
+/* Supplier nav gained "Stock Levels" — tighten spacing so "More" fits at 1440 (as in Figma 41:1075) */
+.csp-nav { gap: 6px; }
+.csp-nav a { padding: 0 var(--cui-space-xl); }
+.csp-nav a.more { margin-left: 8px; }

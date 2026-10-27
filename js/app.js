@@ -17,7 +17,8 @@ const ICONS = {
 const PROTO_SCREENS = [
   ['CSP — Supplier (Ines Ellis, Northwind Supply Co.)', [
     ['supplier-items.html', 'Items'],
-    ['supplier-stock-location.html', 'Stock Location (inline edit)'],
+    ['supplier-stock-locations.html', 'Stock Levels — Stock Locations'],
+    ['supplier-stock-location.html', 'Stock Levels — Stock Balances (inline edit)'],
     ['supplier-bulk-load.html?from=stock-location', 'Bulk Load Inventory Balance'],
   ]],
   ['Enterprise — Buyer (Buyer Demo Company)', [
@@ -33,7 +34,8 @@ const PROTO_COUNTERPART = {
   'supplier-stock-location.html': ['ohb-vendor-stock.html', 'Switch to Buyer: Vendor Stock Balances'],
   'supplier-items.html': ['ohb.html', 'Switch to Buyer: On-Hand Balances'],
   'supplier-bulk-load.html': ['ohb-vendor-stock.html', 'Switch to Buyer: Vendor Stock Balances'],
-  'ohb-vendor-stock.html': ['supplier-stock-location.html', 'Switch to Supplier: Stock Location'],
+  'ohb-vendor-stock.html': ['supplier-stock-location.html', 'Switch to Supplier: Stock Balances'],
+  'supplier-stock-locations.html': ['ohb-vendor-stock.html', 'Switch to Buyer: Vendor Stock Balances'],
   'ohb.html': ['supplier-items.html', 'Switch to Supplier: Items'],
 };
 function renderProtoNav() {
@@ -122,13 +124,20 @@ const CSP_ICONS = {
   translate: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h10M8 3v2M5 5c.8 3.5 3.5 6.5 7 8M11 5c-.8 3.6-3.4 7-7.5 9M12.5 21l4-10 4 10M14 17.5h5"/></svg>',
 };
 
-const CSP_TABS = [['Items', 'supplier-items.html']];
+// Supplier Portal: primary nav → sub-tabs (Figma 41:1075: Stock Levels → Stock Locations | Stock Balances)
+const CSP_HREF = { 'Items': 'supplier-items.html', 'Stock Levels': 'supplier-stock-location.html' };
+const CSP_TABS = {
+  'Items': [['Items', 'supplier-items.html']],
+  'Stock Levels': [['Stock Locations', 'supplier-stock-locations.html'], ['Stock Balances', 'supplier-stock-location.html']],
+};
 
 function renderCspHeader({ primary = 'Items', tab = 'Items' } = {}) {
   queueMicrotask(renderProtoNav);
   const links = ['Invoices', 'Orders', 'Agreements', 'Business Profile', 'Dashboards', 'Payments', 'Service Sheets',
-    'Items', 'ASN', 'Sourcing', 'Setup'];
-  const link = l => `<a href="${l === primary ? '#' : '#'}" ${l === primary ? 'aria-current="page"' : 'data-stub'} class="${l === primary ? 'selected' : ''}">${esc(l)}</a>`;
+    'Items', 'Stock Levels', 'ASN', 'Sourcing', 'Setup'];
+  const link = l => CSP_HREF[l]
+    ? `<a href="${CSP_HREF[l]}" class="${l === primary ? 'selected' : ''}" ${l === primary ? 'aria-current="page"' : ''}>${esc(l)}</a>`
+    : `<a href="#" data-stub>${esc(l)}</a>`;
   document.body.insertAdjacentHTML('afterbegin', `
   <header class="csp">
     <div class="csp-top">
@@ -147,7 +156,7 @@ function renderCspHeader({ primary = 'Items', tab = 'Items' } = {}) {
       ${links.map(link).join('')}
       <a href="#" data-stub class="more">More ${CSP_ICONS.chevron}</a>
     </nav>
-    <nav class="csp-tabs">${CSP_TABS.map(([label, href]) => label === tab
+    <nav class="csp-tabs">${(CSP_TABS[primary] || CSP_TABS.Items).map(([label, href]) => label === tab
       ? `<a href="${href}" class="selected" aria-current="page">${esc(label)}</a>`
       : `<a href="${href}">${esc(label)}</a>`).join('')}</nav>
   </header>`);

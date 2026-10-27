@@ -8,7 +8,7 @@
 </head>
 <body class="csp-page">
   <main class="classic bulk">
-    <a class="back" id="back" href="supplier-stock-location.html">« Back to Stock Location</a>
+    <a class="back" id="back" href="supplier-stock-location.html">« Back to Stock Balances</a>
     <h1>Bulk Load Inventory Balance</h1>
     <div id="result" aria-live="polite"></div>
 
@@ -47,11 +47,10 @@
   <script src="js/app.js"></script>
   <script src="js/supplier-data.js"></script>
   <script>
-    renderCspHeader({ tab: 'Items' });
-
     const params = new URLSearchParams(location.search);
+    renderCspHeader(params.get('from') === 'items' ? { primary: 'Items', tab: 'Items' } : { primary: 'Stock Levels', tab: 'Stock Balances' });
     const customer = SEED[params.get('customer')] ? params.get('customer') : 'Buyer Demo Company';
-    const from = params.get('from') === 'items' ? ['Items', 'supplier-items.html'] : ['Stock Location', 'supplier-stock-location.html'];
+    const from = params.get('from') === 'items' ? ['Items', 'supplier-items.html'] : ['Stock Balances', 'supplier-stock-location.html'];
     const back = document.getElementById('back');
     back.textContent = `« Back to ${from[0]}`; back.href = from[1];
 

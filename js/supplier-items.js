@@ -1,9 +1,9 @@
-/* Item tables shared by the Supplier Portal (Items, Stock Location) and Enterprise On-Hand Balances
+/* Item tables shared by the Supplier Portal (Items, Stock Levels → Stock Balances) and Enterprise On-Hand Balances
  * (On-Hand Balances, Vendor Stock Balances). Page sets window.ITEMS_PAGE = { tab }; everything else
  * (shell, columns, labels, editing, menu) follows from TABS below. */
 const TABS = {
-  'Items':                 { shell: 'csp', file: 'supplier-items.html', cols: 'csp-items', actions: 'menu', menu: 'full' },
-  'Stock Location':        { shell: 'csp', file: 'supplier-stock-location.html', cols: 'stock', actions: 'edit', menu: 'full' },
+  'Items':                 { shell: 'csp', primary: 'Items', file: 'supplier-items.html', cols: 'csp-items', actions: 'menu', menu: 'full' },
+  'Stock Balances':        { shell: 'csp', primary: 'Stock Levels', file: 'supplier-stock-location.html', cols: 'stock', actions: 'edit', menu: 'full' },
   'On-Hand Balances':      { shell: 'enterprise', file: 'ohb.html', cols: 'ohb', actions: null, menu: 'exports' },
   'Item Supply and Demand Reports': { shell: 'enterprise', file: null },
   'Vendor Stock Balances': { shell: 'enterprise', file: 'ohb-vendor-stock.html', cols: 'vendor', actions: null, menu: 'exports' },
@@ -14,12 +14,12 @@ const IS_CSP = CFG.shell === 'csp';
 const IS_STOCK = CFG.cols === 'stock' || CFG.cols === 'vendor';   // supplier-maintained stock view
 const EDITABLE = CFG.actions === 'edit';                          // only the supplier edits inline
 
-if (IS_CSP) renderCspHeader({ tab: 'Items' });
+if (IS_CSP) renderCspHeader({ primary: CFG.primary, tab: PAGE.tab });
 else { renderHeader({ primary: 'Inventory', sub: 'On-Hand Balances' }); renderFooter(); }
 
-// Page-level tabs under the title
-const TAB_SET = IS_CSP ? ['Items', 'Stock Location'] : ['On-Hand Balances', 'Item Supply and Demand Reports', 'Vendor Stock Balances'];
-document.querySelector('.csp-main h1').insertAdjacentHTML('afterend', `
+// Page-level tabs under the title — Enterprise only (the Supplier Portal uses its header sub-tabs)
+const TAB_SET = ['On-Hand Balances', 'Item Supply and Demand Reports', 'Vendor Stock Balances'];
+if (!IS_CSP) document.querySelector('.csp-main h1').insertAdjacentHTML('afterend', `
   <nav class="page-tabs ${IS_CSP ? '' : 'ent'}" aria-label="${IS_CSP ? 'Items' : 'On-Hand Balances'} views">
     ${TAB_SET.map(l => {
       const on = l === PAGE.tab, f = TABS[l].file;
@@ -62,8 +62,8 @@ const C = {
 if (CFG.cols === 'ohb') { C.qoh.label = 'Qty'; C.reserved.label = 'Allocated'; C.atp.label = 'Available'; }
 const COL_SETS = {
   'csp-items': ['num', 'name', 'warehouse', 'qoh', 'reserved', 'atp', 'counted', 'aisle', 'bin', 'level'],
-  stock: ['num', 'name', 'warehouse', 'location', 'ouom', 'atp', 'incoming', 'counted', 'aisle', 'bin', 'level', 'createdOn', 'createdBy', 'updatedBy', 'updatedOn'],
-  vendor: ['num', 'name', 'supplier', 'warehouse', 'location', 'ouom', 'atp', 'incoming', 'counted', 'aisle', 'bin', 'level', 'createdOn', 'createdBy', 'updatedBy', 'updatedOn'],
+  stock: ['num', 'name', 'warehouse', 'ouom', 'atp', 'incoming', 'counted', 'aisle', 'bin', 'level', 'createdOn', 'createdBy', 'updatedBy', 'updatedOn'],
+  vendor: ['num', 'name', 'supplier', 'warehouse', 'ouom', 'atp', 'incoming', 'counted', 'aisle', 'bin', 'level', 'createdOn', 'createdBy', 'updatedBy', 'updatedOn'],
   ohb: ['num', 'name', 'warehouse', 'qoh', 'reserved', 'atp', 'ouom', 'price', 'value', 'currency', 'aisle', 'bin', 'level'],
 };
 const COLS = COL_SETS[CFG.cols];
@@ -273,6 +273,9 @@ document.getElementById('customer')?.addEventListener('change', e => {
   state.warehouses.clear();
   closeMenu(); render();
 });
+
+const preQ = new URLSearchParams(location.search).get('q');
+if (preQ) { state.q = preQ; document.getElementById('search').value = preQ; }
 
 render();
 document.getElementById('rows').addEventListener('keydown', e => {
