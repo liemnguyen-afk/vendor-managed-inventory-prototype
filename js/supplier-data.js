@@ -130,6 +130,7 @@ function saveBalances(customer, okRows) {
   const mine = all[customer] = all[customer] || {};
   const now = new Date(), p = n => String(n).padStart(2, '0');
   const stamp = `${now.getFullYear()}-${p(now.getMonth() + 1)}-${p(now.getDate())}T${p(now.getHours())}:${p(now.getMinutes())}`;
-  okRows.forEach(r => { mine[r.num] = { qoh: r.qoh, updatedBy: CURRENT_USER, updatedOn: stamp }; });
+  // merge, so an inline edit of one field never discards another (e.g. an earlier bulk-loaded balance)
+  okRows.forEach(({ num, note, ...fields }) => { mine[num] = { ...mine[num], ...fields, updatedBy: CURRENT_USER, updatedOn: stamp }; });
   localStorage.setItem(STOCK_KEY, JSON.stringify(all));
 }

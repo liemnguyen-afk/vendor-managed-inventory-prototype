@@ -75,7 +75,7 @@ document.getElementById('head').innerHTML = COLS.map(k =>
   `<th data-sort="${k}" class="${C[k].num ? 'num' : ''}">${C[k].label}</th>`).join('') + (SHOW_ACTIONS ? `<th class="${EDITABLE ? 'act' : ''}">Actions</th>` : '');
 
 /* ---------------------------------------------------------------- Render */
-const state = { customer: 'Buyer Demo Company', view: 'All', q: '', warehouses: new Set(), sort: 'num', dir: 1, userSorted: false, editing: null, editErr: '' };
+const state = { customer: 'Buyer Demo Company', view: 'All', q: '', warehouses: new Set(), sort: 'num', dir: 1, userSorted: false, editing: null, editErrs: null, editVals: null };
 
 function visible() {
   const q = state.q.toLowerCase();
@@ -89,44 +89,51 @@ function visible() {
     });
 }
 
-/* ---------------------------------------------------------------- Inline edit (Stock Location)
- * The pencil makes Unrestricted Quantity editable in place, entered in the item's order UoM (the UOM column).
- * On save: Quantity on Hand = unrestricted + reserved; Updated By / Last Updated are stamped. */
+/* ---------------------------------------------------------------- Inline edit (Stock Balances)
+ * The pencil makes Unrestricted Quantity and Incoming Stock Qty editable in place, both in the item's order
+ * UoM (the UOM column). On save: Quantity on Hand = unrestricted + reserved, incoming is stored as entered,
+ * and Updated By / Last Updated are stamped. */
 const ICO = {
   pencil: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M4 20l1-4.2L15.6 5.2a2 2 0 012.8 0l.4.4a2 2 0 010 2.8L8.2 19 4 20zM13.5 7.3l3.2 3.2"/></svg>',
   // cancel: circled ✕ · save: floppy disk (per design)
   cancel: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9.2"/><path d="M8.8 8.8l6.4 6.4M15.2 8.8l-6.4 6.4"/></svg>',
   save: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4.5 6.5a2 2 0 012-2h9.6l3.4 3.4v9.6a2 2 0 01-2 2h-11a2 2 0 01-2-2z"/><path d="M8.5 4.5v4h6v-4"/><circle cx="12" cy="14.6" r="2" fill="currentColor" stroke="none"/></svg>',
 };
-function editCell(i) {
-  // Quantity only — entered in the item's order UoM (shown in the UOM column)
+const EDIT_FIELDS = { atp: 'Unrestricted Quantity', incoming: 'Incoming Stock Qty' };
+function editCell(i, k) {
+  const val = state.editVals?.[k] ?? i[k], err = state.editErrs?.[k];
   return `<span class="inl">
-      <input type="text" inputmode="numeric" class="inl-qty" value="${esc(state.editVal ?? i.atp)}" aria-label="Unrestricted Quantity for ${esc(i.num)} in ${esc(i.ouom)}" aria-invalid="${!!state.editErr}">
-    </span>${state.editErr ? `<span class="inl-err" role="alert">${esc(state.editErr)}</span>` : `<span class="inl-hint">in ${esc(i.ouom)}</span>`}`;
+      <input type="text" inputmode="numeric" class="inl-qty" data-field="${k}" value="${esc(val)}" aria-label="${EDIT_FIELDS[k]} for ${esc(i.num)} in ${esc(i.ouom)}" aria-invalid="${!!err}">
+    </span>${err ? `<span class="inl-err" role="alert">${esc(err)}</span>` : `<span class="inl-hint">in ${esc(i.ouom)}</span>`}`;
 }
 function saveEdit(tr) {
   const i = itemsFor(state.customer).find(x => x.num === state.editing);
-  const raw = tr.querySelector('.inl-qty').value.trim(), uom = i.ouom;
-  const res = validateRow([i.num, i.location, raw, uom], { [i.num]: i }, 0);
-  if (res.error) { state.editErr = res.error.replace(/^Row 0: /, ''); state.editVal = raw; render(); focusEdit(); return; }
-  const qoh = res.ok.qoh + i.reserved;
-  saveBalances(state.customer, [{ num: i.num, qoh }]);
-  state.editing = null; state.editErr = ''; state.editVal = null;
+  const vals = Object.fromEntries([...tr.querySelectorAll('.inl-qty')].map(el => [el.dataset.field, el.value.trim()]));
+  const errs = {};
+  const res = validateRow([i.num, i.location, vals.atp, i.ouom], { [i.num]: i }, 0);
+  if (res.error) errs.atp = res.error.replace(/^Row 0: /, '');
+  if (!/^\d+$/.test(vals.incoming)) errs.incoming = `Incoming Stock Qty "${vals.incoming}" must be a whole number.`;
+  if (Object.keys(errs).length) {
+    state.editErrs = errs; state.editVals = vals;
+    render(); focusEdit(Object.keys(errs)[0]); return;
+  }
+  const atp = res.ok.qoh, incoming = Number(vals.incoming);
+  saveBalances(state.customer, [{ num: i.num, qoh: atp + i.reserved, incoming }]);
+  state.editing = null; state.editErrs = null; state.editVals = null;
   render();
-  toast(`${i.num}: Unrestricted Quantity updated to ${num(res.ok.qoh)} ${i.ouom}`);
+  const changed = [atp !== i.atp && `Unrestricted Quantity ${num(atp)}`, incoming !== i.incoming && `Incoming Stock Qty ${num(incoming)}`].filter(Boolean);
+  toast(`${i.num}: ${changed.length ? changed.join(' · ') + ` ${i.ouom}` : 'no changes'}`);
 }
-function focusEdit(uom) {
-  const tr = document.querySelector('tr.editing');
-  if (!tr) return;
-
-  const inp = tr.querySelector('.inl-qty'); inp.focus(); inp.select();
+function focusEdit(field = 'atp') {
+  const inp = document.querySelector(`tr.editing .inl-qty[data-field="${field}"]`);
+  if (inp) { inp.focus(); inp.select(); }
 }
 
 function render() {
   const rows = visible();
   const span = COLS.length + (SHOW_ACTIONS ? 1 : 0);
   document.getElementById('rows').innerHTML = rows.length ? rows.map(i => `<tr class="${state.editing === i.num ? 'editing' : ''}" data-num="${esc(i.num)}">
-      ${COLS.map(k => `<td class="${[C[k].cls, C[k].num ? 'num' : ''].filter(Boolean).join(' ')}">${EDITABLE && k === 'atp' && state.editing === i.num ? editCell(i) : cellHtml(k, i)}</td>`).join('')}
+      ${COLS.map(k => `<td class="${[C[k].cls, C[k].num ? 'num' : ''].filter(Boolean).join(' ')}">${EDITABLE && k in EDIT_FIELDS && state.editing === i.num ? editCell(i, k) : cellHtml(k, i)}</td>`).join('')}
       ${!SHOW_ACTIONS ? '' : EDITABLE ? `<td class="act">${state.editing === i.num
         ? `<button class="row-act cancel" data-edit="cancel" aria-label="Cancel editing ${esc(i.num)}">${ICO.cancel}</button><button class="row-act save" data-edit="save" aria-label="Save ${esc(i.num)}">${ICO.save}</button>`
         : `<button class="row-act" data-edit="start" aria-label="Edit ${esc(i.num)}" ${state.editing ? 'disabled' : ''}>${ICO.pencil}</button>`}</td>`
@@ -247,8 +254,8 @@ document.getElementById('rows').addEventListener('click', e => {
   const ed = e.target.closest('[data-edit]');
   if (ed) {
     const tr = ed.closest('tr');
-    if (ed.dataset.edit === 'start') { closeMenu(); state.editing = tr.dataset.num; state.editErr = ''; state.editVal = null; render(); focusEdit(); }
-    else if (ed.dataset.edit === 'cancel') { state.editing = null; state.editErr = ''; render(); }
+    if (ed.dataset.edit === 'start') { closeMenu(); state.editing = tr.dataset.num; state.editErrs = null; state.editVals = null; render(); focusEdit(); }
+    else if (ed.dataset.edit === 'cancel') { state.editing = null; state.editErrs = null; state.editVals = null; render(); }
     else saveEdit(tr);
     return;
   }
@@ -282,5 +289,5 @@ document.getElementById('rows').addEventListener('keydown', e => {
   const tr = e.target.closest('tr.editing');
   if (!tr) return;
   if (e.key === 'Enter') { e.preventDefault(); saveEdit(tr); }
-  if (e.key === 'Escape') { state.editing = null; state.editErr = ''; render(); }
+  if (e.key === 'Escape') { state.editing = null; state.editErrs = null; state.editVals = null; render(); }
 });
