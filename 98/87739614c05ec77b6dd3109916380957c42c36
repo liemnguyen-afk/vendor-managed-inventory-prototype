@@ -1,0 +1,19 @@
+catalog.info.yaml
+  s_623fc2d8ecca21::t_790d68676f06da 1-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9887739614c05ec77b6dd3109916380957c42c36",
+  "prompts": {},
+  "sessions": {
+    "s_623fc2d8ecca21": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "391a6901-7741-4bdf-9322-0d45d37af900",
+        "model": "unknown"
+      },
+      "human_author": "liemnguyen-afk <301846626+liemnguyen-afk@users.noreply.github.com>"
+    }
+  }
+}
