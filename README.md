@@ -4,7 +4,7 @@ A static, clickable prototype of **Vendor Managed Inventory**.
 
 **▶ View the live prototype: https://liemnguyen-afk.github.io/vendor-managed-inventory-prototype/**
 
-To run it locally, open [`index.html`](index.html).
+To run it locally, open [`index.html`](index.html) — it opens the Supplier Portal **Stock Location** page.
 
 No build step: plain HTML, CSS and JavaScript.
 
@@ -14,7 +14,7 @@ No build step: plain HTML, CSS and JavaScript.
 
 | Page | What you can do |
 | --- | --- |
-| [`index.html`](index.html) | Classic Setup page with Adjustment Codes, Inventory Valuation, Cycle Count, Receipts, On-Hand Balances, Lot Management and Inventory Options. The green **+** adds an adjustment-code row. On-Hand Balances has a new **Allow Vendor Managed Inventory** checkbox (off by default). **Save** validates (a reason needs a code and vice versa; day fields must be whole numbers) and stores the settings in `localStorage`; **Cancel** reverts to the last save. Valuation Method is read-only because an inventory balance exists. |
+| [`inventory-settings.html`](inventory-settings.html) | Classic Setup page with Adjustment Codes, Inventory Valuation, Cycle Count, Receipts, On-Hand Balances, Lot Management and Inventory Options. The green **+** adds an adjustment-code row. On-Hand Balances has a new **Allow Vendor Managed Inventory** checkbox (off by default). **Save** validates (a reason needs a code and vice versa; day fields must be whole numbers) and stores the settings in `localStorage`; **Cancel** reverts to the last save. Valuation Method is read-only because an inventory balance exists. |
 
 ### Warehouses — Figma [`11:14`](https://www.figma.com/design/7iUP0blmrcCG6lBzGADb9q/Vendor-Managed-Inventory?node-id=11-14)
 

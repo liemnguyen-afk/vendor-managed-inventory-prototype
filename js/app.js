@@ -22,7 +22,7 @@ const NAV_LINKS = {
 };
 
 // Pages that exist in this prototype; everything else is a stub link
-const HEADER_HREF = { 'Setup': 'index.html', 'Inventory': 'ohb.html', 'On-Hand Balances': 'ohb.html' };
+const HEADER_HREF = { 'Setup': 'inventory-settings.html', 'Inventory': 'ohb.html', 'On-Hand Balances': 'ohb.html' };
 const SUB_LINKS = {
   Setup: ['All Setup Items', 'Company Info', 'Accounts', 'Users', 'Approvals', 'Budget Periods', 'Budget Lines'],
   Inventory: ['Overview', 'Workbench', 'On-Hand Balances', 'Fulfillment', 'Picklists'],
@@ -52,7 +52,7 @@ function renderHeader({ primary = 'Setup', theme = 'white', sub = null } = {}) {
       </div>
     </div>
     <nav class="gh-nav">
-      <a class="home" href="index.html" aria-label="Home"><img src="assets/${blue ? 'home-white' : 'home'}.svg" alt=""></a>
+      <a class="home" href="ohb.html" aria-label="Home"><img src="assets/${blue ? 'home-white' : 'home'}.svg" alt=""></a>
       ${NAV_LINKS[theme].map(l => link(l, l === primary)).join('')}
     </nav>
     <nav class="gh-subnav">${subLinks.map(l => link(l, l === sub)).join('')}</nav>
