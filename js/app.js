@@ -12,42 +12,115 @@ const ICONS = {
 };
 
 /* ---------------------------------------------------------------- Global header */
-function renderHeader({ primary = 'Setup', sub = 'All Setup Items' } = {}) {
-  const primaryLinks = ['Expenses', 'Forecasts', 'Requests', 'Orders', 'Contingent Workforce', 'Invoices',
-    'Spend Pulse', 'Payments', 'Spend Guard', 'Setup', 'More...'];
-  const subLinks = ['All Setup Items', 'Company Info', 'Accounts', 'Users', 'Approvals', 'Budget Periods', 'Budget Lines'];
-  const link = (label, selected) =>
-    `<a href="${label === 'Setup' ? 'index.html' : '#'}" ${label === 'Setup' ? '' : 'data-stub'} class="${selected ? 'selected' : ''}">${esc(label)}</a>`;
+// theme 'white': search bar + white nav (Inventory Settings screengrab).
+// theme 'blue': classic blue nav band, no search, no apps button (Warehouse screengrab).
+const NAV_LINKS = {
+  white: ['Expenses', 'Forecasts', 'Requests', 'Orders', 'Contingent Workforce', 'Invoices',
+    'Spend Pulse', 'Payments', 'Spend Guard', 'Inventory', 'Setup', 'More...'],
+  blue: ['Expenses', 'Requests', 'Orders', 'Agreements', 'Invoices', 'Spend Pulse', 'Payments', 'Inventory',
+    'Sourcing', 'Suppliers', 'Contracts', 'Spend Guard', 'Setup', 'More...'],
+};
+
+// Pages that exist in this prototype; everything else is a stub link
+const HEADER_HREF = { 'Setup': 'index.html', 'Inventory': 'ohb.html', 'On-Hand Balances': 'ohb.html' };
+const SUB_LINKS = {
+  Setup: ['All Setup Items', 'Company Info', 'Accounts', 'Users', 'Approvals', 'Budget Periods', 'Budget Lines'],
+  Inventory: ['Overview', 'Workbench', 'On-Hand Balances', 'Fulfillment', 'Picklists'],
+};
+
+function renderHeader({ primary = 'Setup', theme = 'white', sub = null } = {}) {
+  const subLinks = SUB_LINKS[primary] || SUB_LINKS.Setup;
+  const link = (label, selected) => HEADER_HREF[label]
+    ? `<a href="${HEADER_HREF[label]}" class="${selected ? 'selected' : ''}" ${selected ? 'aria-current="page"' : ''}>${esc(label)}</a>`
+    : `<a href="#" data-stub class="${selected ? 'selected' : ''}">${esc(label)}</a>`;
+  const blue = theme === 'blue';
 
   document.body.insertAdjacentHTML('afterbegin', `
-  <header class="gh">
+  <header class="gh ${theme}">
     <div class="gh-top">
-      <label class="gh-search">
+      ${blue ? '' : `<label class="gh-search">
         <input placeholder="What do you need?">
         <img src="assets/magnifying-glass.svg" width="18" height="18" alt="">
-      </label>
+      </label>`}
       <div class="gh-right">
         <span class="gh-avatar">LN</span>
         <button class="gh-circle" data-stub aria-label="Notifications"><img src="assets/bell.svg" alt=""></button>
         <button class="gh-circle cart" data-stub aria-label="Cart"><img src="assets/cart.svg" alt=""><span class="badge">0</span></button>
         <button class="gh-circle" data-stub aria-label="Tasks"><span class="tasks">${ICONS.check}</span></button>
-        <button class="gh-circle" data-stub aria-label="Apps">${ICONS.apps}</button>
+        ${blue ? '' : `<button class="gh-circle" data-stub aria-label="Apps">${ICONS.apps}</button>`}
         <button class="gh-ai" data-stub aria-label="Navi AI assistant"><img src="assets/ai-sparkle.svg" alt=""></button>
       </div>
     </div>
     <nav class="gh-nav">
-      <a class="home" href="index.html" aria-label="Home"><img src="assets/home.svg" alt=""></a>
-      ${primaryLinks.map(l => link(l, l === primary)).join('')}
+      <a class="home" href="index.html" aria-label="Home"><img src="assets/${blue ? 'home-white' : 'home'}.svg" alt=""></a>
+      ${NAV_LINKS[theme].map(l => link(l, l === primary)).join('')}
     </nav>
-    <nav class="gh-subnav">${subLinks.map(l => link(l, false)).join('')}</nav>
+    <nav class="gh-subnav">${subLinks.map(l => link(l, l === sub)).join('')}</nav>
   </header>`);
 }
 
+/* ---------------------------------------------------------------- Supplier Portal (CSP) shell */
+// Clarity-styled supplier header + footer (Supplier Portal Items screengrab).
+const CSP_ICONS = {
+  home: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M3.5 10.5L12 3.5l8.5 7V20a.5.5 0 01-.5.5h-5v-6h-6v6H4a.5.5 0 01-.5-.5z"/></svg>',
+  bell: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 17V11a6 6 0 0112 0v6l1.5 2h-15zM10 21h4"/></svg>',
+  help: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9.25"/><path d="M9.6 9.4a2.5 2.5 0 114 2c-.9.6-1.6 1.1-1.6 2.3M12 16.8v.2"/></svg>',
+  chevron: '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5l3 3 3-3"/></svg>',
+  translate: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h10M8 3v2M5 5c.8 3.5 3.5 6.5 7 8M11 5c-.8 3.6-3.4 7-7.5 9M12.5 21l4-10 4 10M14 17.5h5"/></svg>',
+};
+
+const CSP_TABS = [['Items', 'supplier-items.html']];
+
+function renderCspHeader({ primary = 'Items', tab = 'Items' } = {}) {
+  const links = ['Invoices', 'Orders', 'Agreements', 'Business Profile', 'Dashboards', 'Payments', 'Service Sheets',
+    'Items', 'ASN', 'Sourcing', 'Setup'];
+  const link = l => `<a href="${l === primary ? '#' : '#'}" ${l === primary ? 'aria-current="page"' : 'data-stub'} class="${l === primary ? 'selected' : ''}">${esc(l)}</a>`;
+  document.body.insertAdjacentHTML('afterbegin', `
+  <header class="csp">
+    <div class="csp-top">
+      <a class="csp-logo" href="#" data-stub aria-label="Coupa Supplier Portal home">
+        <img src="assets/coupa-logo-blue.svg" alt="coupa"><span>Supplier Portal</span>
+      </a>
+      <div class="csp-right">
+        <button class="csp-upgrade" data-stub>Upgrade</button>
+        <button class="csp-icon bell" data-stub aria-label="Notifications">${CSP_ICONS.bell}<span class="dot"></span></button>
+        <button class="csp-icon" data-stub aria-label="Help">${CSP_ICONS.help}</button>
+        <button class="csp-avatar" data-stub aria-label="Account">IE</button>
+      </div>
+    </div>
+    <nav class="csp-nav">
+      <a class="home" href="#" data-stub aria-label="Home">${CSP_ICONS.home}</a>
+      ${links.map(link).join('')}
+      <a href="#" data-stub class="more">More ${CSP_ICONS.chevron}</a>
+    </nav>
+    <nav class="csp-tabs">${CSP_TABS.map(([label, href]) => label === tab
+      ? `<a href="${href}" class="selected" aria-current="page">${esc(label)}</a>`
+      : `<a href="${href}">${esc(label)}</a>`).join('')}</nav>
+  </header>`);
+  document.body.insertAdjacentHTML('beforeend', `
+  <footer class="csp-foot">
+    <span class="lang">${CSP_ICONS.translate}English (India) ${CSP_ICONS.chevron}</span>
+    <a href="#" data-stub>Terms of Use</a><i></i><a href="#" data-stub>Privacy Policy</a>
+    <span class="copy">© 2006-2026 Coupa Software Incorporated</span>
+  </footer>
+  <button class="csp-ai" data-stub aria-label="Navi AI assistant"><img src="assets/ai-sparkle.svg" alt=""></button>`);
+}
+
+// Toast for pages without the classic .classic container
+function toast(msg) {
+  let t = document.querySelector('.toast');
+  if (!t) { t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._h);
+  t._h = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
 /* ---------------------------------------------------------------- Classic footer */
-function renderFooter() {
+function renderFooter({ logo = true } = {}) {
   document.body.insertAdjacentHTML('beforeend', `
   <footer class="classic-foot">
-    <img src="assets/coupa-logo-blue.svg" alt="coupa">
+    ${logo ? '<img src="assets/coupa-logo-blue.svg" alt="coupa">' : ''}
     <div class="links">
       <span>Total Spend Management - Make Margins Multiply</span><i>•</i>
       <span class="lang">${ICONS.translate}English (United States)</span><i>•</i>
@@ -72,15 +145,31 @@ function flash(msg, kind = 'ok') {
   f._h = setTimeout(() => { f.hidden = true; }, 5000);
 }
 
+/* ---------------------------------------------------------------- Warehouse store */
+// Warehouses live in localStorage; Laughlin Nevada is the seeded sample from the screengrab.
+const WH_KEY = 'vmi.warehouses';
+const SAMPLE_WAREHOUSES = [{
+  id: 'laughlin', name: 'Laughlin Nevada', type: 'Warehouse', description: 'Laughlin Warehouse', currency: 'USD', active: true,
+  cf1: '', cf2: 'Test User', cf3: 'Value LookUp User', txbox: 'This is the warehouse king',
+  certifications: '', watcher: '', attachments: '',
+  locations: [
+    { aisle: '1', bin: '1', level: '1', active: true },
+    { aisle: '2', bin: '2', level: '2', active: true },
+    { aisle: '4', bin: '4', level: '4', active: true },
+  ],
+}];
+const loadWarehouses = () => JSON.parse(localStorage.getItem(WH_KEY) || 'null') || SAMPLE_WAREHOUSES;
+const saveWarehouses = list => localStorage.setItem(WH_KEY, JSON.stringify(list));
+
 /* ---------------------------------------------------------------- Stub links */
 document.addEventListener('click', e => {
   const stub = e.target.closest('[data-stub]');
   if (!stub) return;
   e.preventDefault();
-  flash('Not part of this prototype flow');
+  document.querySelector('.classic') ? flash('Not part of this prototype flow') : toast('Not part of this prototype flow');
 });
 
-function initPage(headerOpts) {
+function initPage(headerOpts = {}, footerOpts = {}) {
   renderHeader(headerOpts);
-  renderFooter();
+  renderFooter(footerOpts);
 }

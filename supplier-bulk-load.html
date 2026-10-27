@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Bulk Load Inventory Balance · Coupa Supplier Portal · Vendor Managed Inventory prototype</title>
+  <link rel="stylesheet" href="css/clarity-tokens.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="csp-page">
+  <main class="classic bulk">
+    <a class="back" id="back" href="supplier-stock-location.html">« Back to Stock Location</a>
+    <h1>Bulk Load Inventory Balance</h1>
+    <div id="result" aria-live="polite"></div>
+
+    <h3>Follow these steps to upload inventory balance</h3>
+    <ol class="steps">
+      <li>
+        <b>Download</b> the CSV template, or <b>export</b> the current list (Based on the CSV File Field Separator in your Language and Region settings.)
+        <div class="step-actions">
+          <button type="button" class="btn-gray" id="dl-btn" aria-haspopup="menu" aria-expanded="false">Download <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 4.5l3 3 3-3"/></svg></button>
+          <span>or</span>
+          <button type="button" class="btn-gray" id="ex-btn" aria-haspopup="menu" aria-expanded="false">Export To <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 4.5l3 3 3-3"/></svg></button>
+        </div>
+      </li>
+      <li>
+        <b>Fill in or update the CSV file.</b>
+        <ul>
+          <li>Fields marked with a "*" are mandatory.</li>
+          <li>Each row uploaded will create a new inventory balance.</li>
+          <li>Quantity is accepted only in the item's order UoM (OUOM) or consumption UoM (CUOM). Any other UoM is rejected.</li>
+          <li>Click Start Upload and the system will verify the file using the first 6 rows, and load the file if no errors are found.</li>
+        </ul>
+      </li>
+      <li>
+        <b>Load the updated file</b>
+        <div class="step-actions"><input type="file" id="file" accept=".csv,text/csv" aria-label="CSV file to upload"></div>
+        <p class="note">Note: If you are loading csv files with non-English characters, please consult the following <a href="#" data-stub>help note</a>.</p>
+        <p class="proto">Prototype: try a sample file —
+          <button type="button" class="link" data-sample="error">with a UoM error</button> ·
+          <button type="button" class="link" data-sample="valid">all rows valid</button>
+          <span id="sample-name"></span></p>
+      </li>
+    </ol>
+    <div class="form-actions"><button type="button" class="btn-save" id="start">Start Upload</button></div>
+  </main>
+
+  <script src="js/app.js"></script>
+  <script src="js/supplier-data.js"></script>
+  <script>
+    renderCspHeader({ tab: 'Items' });
+
+    const params = new URLSearchParams(location.search);
+    const customer = SEED[params.get('customer')] ? params.get('customer') : 'Buyer Demo Company';
+    const from = params.get('from') === 'items' ? ['Items', 'supplier-items.html'] : ['Stock Location', 'supplier-stock-location.html'];
+    const back = document.getElementById('back');
+    back.textContent = `« Back to ${from[0]}`; back.href = from[1];
+
+    /* ---- Download ▾ / Export To ▾ (classic dropdown menus) ---- */
+    let menu = null;
+    const closeMenu = () => { if (menu) { menu.trigger.setAttribute('aria-expanded', 'false'); menu.el.remove(); menu = null; } };
+    function dropdown(trigger, items) {
+      const same = menu?.trigger === trigger; closeMenu(); if (same) return;
+      const el = document.createElement('div');
+      el.className = 'menu'; el.setAttribute('role', 'menu');
+      el.innerHTML = items.map(([id, label]) => `<button role="menuitem" data-act="${id}">${label}</button>`).join('');
+      document.body.appendChild(el);
+      const r = trigger.getBoundingClientRect();
+      el.style.top = `${r.bottom + scrollY + 4}px`; el.style.left = `${r.left + scrollX}px`;
+      trigger.setAttribute('aria-expanded', 'true');
+      menu = { trigger, el };
+      el.addEventListener('click', ev => { const a = ev.target.closest('[data-act]')?.dataset.act; if (a) { closeMenu(); run(a); } });
+    }
+    document.addEventListener('click', e => { if (menu && !menu.el.contains(e.target) && !menu.trigger.contains(e.target)) closeMenu(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+    document.getElementById('dl-btn').addEventListener('click', e => dropdown(e.currentTarget, [['tpl-csv', 'CSV template (Plain Text)'], ['tpl-xls', 'CSV template for Excel']]));
+    document.getElementById('ex-btn').addEventListener('click', e => dropdown(e.currentTarget, [['ex-csv', 'CSV Plain Text'], ['ex-xls', 'CSV for Excel'], ['ex-xlsx', 'XLSX']]));
+    function run(a) {
+      const current = [TEMPLATE_HEAD, ...templateRows(itemsFor(customer))];
+      if (a === 'tpl-csv') exportCsvPlain('inventory-balance-template', [TEMPLATE_HEAD]);
+      if (a === 'tpl-xls') exportCsvExcel('inventory-balance-template', [TEMPLATE_HEAD]);
+      if (a === 'ex-csv') exportCsvPlain('inventory-balance', current);
+      if (a === 'ex-xls') exportCsvExcel('inventory-balance', current);
+      if (a === 'ex-xlsx') exportXlsx('inventory-balance', current);
+      toast(a.startsWith('tpl') ? 'Downloaded inventory-balance-template.csv' : `Exported inventory-balance.${a === 'ex-xlsx' ? 'xlsx' : 'csv'}`);
+    }
+
+    /* ---- Upload ---- */
+    const SAMPLES = {
+      error: toCsv([TEMPLATE_HEAD,
+        ['VMI-10022', 'LAU-1-1-2', '400', 'BX'],
+        ['VMI-10021', 'LAU-1-1-1', '25000', 'EA'],
+        ['VMI-20117', 'RNO-B-14-2', '12', 'CS'],
+        ['VMI-30355', 'PHX-9-1-2', '1200', 'EA'],
+        ['VMI-30390', 'PHX-9-3-1', '150', 'PR']]),
+      valid: toCsv([TEMPLATE_HEAD,
+        ['VMI-10022', 'LAU-1-1-2', '400', 'BX'],
+        ['VMI-10021', 'LAU-1-1-1', '25000', 'EA'],
+        ['VMI-20117', 'RNO-B-14-2', '300', 'BDL'],
+        ['VMI-30355', 'PHX-9-1-2', '1200', 'EA'],
+        ['VMI-30390', 'PHX-9-3-1', '2000', 'PR']]),
+    };
+    let sample = null;
+    document.querySelectorAll('[data-sample]').forEach(b => b.addEventListener('click', () => {
+      sample = { name: `sample-${b.dataset.sample}.csv`, text: SAMPLES[b.dataset.sample] };
+      document.getElementById('file').value = '';
+      document.getElementById('sample-name').textContent = `(${sample.name} selected)`;
+    }));
+    document.getElementById('file').addEventListener('change', () => { sample = null; document.getElementById('sample-name').textContent = ''; });
+
+    const result = document.getElementById('result');
+    const box = (cls, html) => { result.innerHTML = `<div class="flash ${cls}">${html}</div>`; result.scrollIntoView({ block: 'nearest' }); };
+
+    document.getElementById('start').addEventListener('click', async () => {
+      const f = document.getElementById('file').files[0];
+      const src = f ? { name: f.name, text: await f.text() } : sample;
+      if (!src) return box('error', 'Choose a CSV file to upload.');
+      const rows = parseCsv(src.text);
+      const head = (rows.shift() || []).map(h => h.replace(/\*$/, '').trim().toLowerCase());
+      const want = TEMPLATE_HEAD.map(h => h.replace(/\*$/, '').toLowerCase());
+      const missing = want.filter(h => !head.includes(h));
+      if (missing.length) return box('error', `<b>${esc(src.name)} wasn't loaded.</b> Missing mandatory column${missing.length > 1 ? 's' : ''}: ${esc(missing.join(', '))}.`);
+      if (!rows.length) return box('error', `<b>${esc(src.name)} wasn't loaded.</b> The file has no data rows.`);
+      const items = Object.fromEntries(itemsFor(customer).map(i => [i.num, i]));
+      const ordered = rows.map(r => want.map(h => r[head.indexOf(h)]));
+      const results = ordered.map((r, n) => validateRow(r, items, n + 2));
+      // Verify with the first 6 rows; load only if they are error-free
+      const firstErrors = results.slice(0, 6).filter(x => x.error).map(x => x.error);
+      if (firstErrors.length) {
+        return box('error', `<b>${esc(src.name)} wasn't loaded.</b> Fix these errors and upload again:<ul>${firstErrors.map(m => `<li>${esc(m)}</li>`).join('')}</ul>`);
+      }
+      const ok = results.filter(x => x.ok).map(x => x.ok), later = results.filter(x => x.error).map(x => x.error);
+      saveBalances(customer, ok);
+      box(later.length ? 'warn' : 'ok', `<b>Inventory balance loaded for ${ok.length} row${ok.length === 1 ? '' : 's'} from ${esc(src.name)}.</b>
+        <ul>${ok.map(r => `<li>${esc(r.num)}: ${esc(r.note)}</li>`).join('')}</ul>
+        ${later.length ? `<b>${later.length} row${later.length > 1 ? 's' : ''} weren't loaded:</b><ul>${later.map(m => `<li>${esc(m)}</li>`).join('')}</ul>` : ''}
+        <a href="${from[1]}">View ${esc(from[0])}</a>`);
+      document.getElementById('file').value = ''; sample = null; document.getElementById('sample-name').textContent = '';
+    });
+  </script>
+</body>
+</html>
