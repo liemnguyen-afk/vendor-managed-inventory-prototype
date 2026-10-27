@@ -37,11 +37,11 @@ const PROTO_COUNTERPART = {
   'ohb.html': ['supplier-items.html', 'Switch to Supplier: Items'],
 };
 function renderProtoNav() {
-  if (document.querySelector('.proto')) return;
+  if (document.querySelector('.proto-nav')) return;
   const here = location.pathname.split('/').pop() || 'index.html';
   const other = PROTO_COUNTERPART[here];
   document.body.insertAdjacentHTML('beforeend', `
-  <div class="proto">
+  <div class="proto-nav">
     <div class="panel" id="proto-panel" role="dialog" aria-label="Prototype navigator">
       ${other ? `<a class="switch" href="${other[0]}">⇄ ${esc(other[1])}</a>` : ''}
       ${PROTO_SCREENS.map(([group, items]) => `<h4>${esc(group)}</h4>${items.map(([href, label]) =>
@@ -51,7 +51,7 @@ function renderProtoNav() {
     </div>
     <button type="button" class="proto-toggle" aria-expanded="false" aria-controls="proto-panel">Prototype ▾</button>
   </div>`);
-  const root = document.querySelector('.proto'), toggle = root.querySelector('.proto-toggle');
+  const root = document.querySelector('.proto-nav'), toggle = root.querySelector('.proto-toggle');
   const set = open => { root.classList.toggle('open', open); toggle.setAttribute('aria-expanded', String(open)); };
   toggle.addEventListener('click', () => set(!root.classList.contains('open')));
   document.addEventListener('click', e => { if (!root.contains(e.target)) set(false); });
