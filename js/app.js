@@ -15,18 +15,26 @@ const ICONS = {
  * Bottom-left "Prototype ▾" toggle: jump to any screen, switch between the supplier and buyer views of
  * the same stock, or reset the sample data. Reviewer tool — not part of the product UI. */
 const PROTO_SCREENS = [
-  ['CSP — Supplier (Ines Ellis, Northwind Supply Co.)', [
-    ['supplier-items.html', 'Items'],
-    ['supplier-stock-locations.html', 'Stock Levels — Stock Locations'],
-    ['supplier-stock-location.html', 'Stock Levels — Stock Balances (inline edit)'],
-    ['supplier-bulk-load.html?from=stock-location', 'Bulk Load Inventory Balance'],
-  ]],
-  ['Enterprise — Buyer (Buyer Demo Company)', [
-    ['ohb.html', 'On-Hand Balances'],
-    ['ohb-vendor-stock.html', 'Vendor Stock Balances'],
-    ['inventory-settings.html', 'Inventory Settings'],
+  ['1 · Buyer admin setup (Enterprise)', [
+    ['inventory-settings.html', 'Inventory Settings — Allow Vendor Managed Inventory'],
+    ['item-vmi.html', 'Item — Allow Supplier to upload stock levels'],
+    ['supplier-vmi.html', 'Supplier profile — stock upload + frequency'],
     ['warehouse.html', 'Warehouse — Laughlin Nevada'],
     ['warehouse-create.html', 'Create Warehouse'],
+  ]],
+  ['2 · Supplier (CSP · Ines Ellis, Northwind Supply Co.)', [
+    ['supplier-stock-locations.html', 'Stock Levels — Stock Locations'],
+    ['supplier-stock-location-new.html', 'Create Stock Location'],
+    ['supplier-stock-location.html', 'Stock Levels — Stock Balances (inline edit)'],
+    ['supplier-bulk-load.html?from=stock-location', 'Bulk Load Inventory Balance'],
+    ['supplier-items.html', 'Items'],
+  ]],
+  ['3 · Buyer (Enterprise · Buyer Demo Company)', [
+    ['ohb-vendor-stock.html', 'On-Hand Balances — Vendor Stock Balances'],
+    ['ohb.html', 'On-Hand Balances'],
+    ['replenishment-report.html', 'Replenishment Report'],
+    ['email-replenishment.html', 'Replenishment notification email'],
+    ['requisitions.html', 'Requisitions — review & submit'],
   ]],
 ];
 // Same data, other side
@@ -76,10 +84,12 @@ const NAV_LINKS = {
 };
 
 // Pages that exist in this prototype; everything else is a stub link
-const HEADER_HREF = { 'Setup': 'inventory-settings.html', 'Inventory': 'ohb.html', 'On-Hand Balances': 'ohb.html' };
+const HEADER_HREF = { 'Setup': 'inventory-settings.html', 'Inventory': 'ohb.html', 'On-Hand Balances': 'ohb.html',
+  'Replenishment': 'replenishment-report.html', 'Requests': 'requisitions.html', 'Requisitions': 'requisitions.html', 'Suppliers': 'supplier-vmi.html' };
 const SUB_LINKS = {
   Setup: ['All Setup Items', 'Company Info', 'Accounts', 'Users', 'Approvals', 'Budget Periods', 'Budget Lines'],
-  Inventory: ['Overview', 'Workbench', 'On-Hand Balances', 'Fulfillment', 'Picklists'],
+  Inventory: ['Overview', 'Workbench', 'On-Hand Balances', 'Replenishment', 'Fulfillment', 'Picklists'],
+  Requests: ['Requisitions', 'Requisition Approvals', 'Order Lists'],
 };
 
 function renderHeader({ primary = 'Setup', theme = 'white', sub = null } = {}) {

@@ -129,6 +129,7 @@
       }
       const ok = results.filter(x => x.ok).map(x => x.ok), later = results.filter(x => x.error).map(x => x.error);
       saveBalances(customer, ok);
+      recordUpload(customer, src.name, ok.length);
       box(later.length ? 'warn' : 'ok', `<b>Inventory balance loaded for ${ok.length} row${ok.length === 1 ? '' : 's'} from ${esc(src.name)}.</b>
         <ul>${ok.map(r => `<li>${esc(r.num)}: ${esc(r.note)}</li>`).join('')}</ul>
         ${later.length ? `<b>${later.length} row${later.length > 1 ? 's' : ''} weren't loaded:</b><ul>${later.map(m => `<li>${esc(m)}</li>`).join('')}</ul>` : ''}

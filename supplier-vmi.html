@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Edit Supplier — Northwind Supply Co. · Vendor Managed Inventory prototype</title>
+  <link rel="stylesheet" href="css/clarity-tokens.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <main class="classic">
+    <h1>Edit Supplier</h1>
+    <p class="subject">Northwind Supply Co. <span class="muted">(Supplier #40112)</span></p>
+
+    <form id="sup" novalidate>
+      <h2>General Info</h2>
+      <div class="rows">
+        <span class="lbl">Name</span><span>Northwind Supply Co.</span>
+        <span class="lbl">Status</span><span>Active</span>
+        <span class="lbl">CSP Account</span><span>Ines Ellis (ines.ellis@northwind-supply.example)</span>
+        <span class="lbl">Inventory Collaboration</span><span>Enabled</span>
+      </div>
+
+      <h2>Vendor Managed Inventory <span class="new-badge">New · R48</span></h2>
+      <div class="opts">
+        <label class="new-opt"><input type="checkbox" name="allow" checked> Allow Supplier to upload Stock levels</label>
+        <span class="hint">When on, this supplier can create stock locations and share on-hand balances for VMI items in the Coupa Supplier Portal.</span>
+      </div>
+      <div class="rows" id="freq-rows">
+        <span class="lbl">Update frequency</span>
+        <span><select name="freq"><option>Daily</option><option selected>Weekly</option><option>Monthly</option></select></span>
+        <span class="hint">The supplier is asked to upload stock at least this often; buyers see when the next update is due.</span>
+        <span class="lbl">Last stock upload</span><span id="last"></span>
+        <span class="lbl">Next update required on</span><span id="next"></span>
+        <span class="lbl">Stock locations</span><span><a href="ohb-vendor-stock.html">3 stock locations · view Vendor Stock Balances</a></span>
+      </div>
+
+      <div class="form-actions">
+        <a href="#" id="cancel">Cancel</a>
+        <button type="submit" class="btn-save">Save</button>
+      </div>
+    </form>
+  </main>
+
+  <script src="js/app.js"></script>
+  <script src="js/supplier-data.js"></script>
+  <script>
+    initPage({ primary: 'Setup' });
+    const form = document.getElementById('sup'), C = 'Buyer Demo Company';
+    function show() {
+      const u = lastUpload(C);
+      document.getElementById('last').textContent = u ? `${fmtDateTime(u.on)} by ${u.by} · ${u.file}` : 'None yet';
+      const d = u && new Date(u.on.slice(0, 10) + 'T00:00'); if (d) d.setDate(d.getDate() + FREQ_DAYS[form.freq.value]);
+      document.getElementById('next').textContent = d ? `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}/${d.getFullYear()}` : '—';
+      document.getElementById('freq-rows').style.opacity = form.allow.checked ? 1 : .45;
+      form.freq.disabled = !form.allow.checked;
+    }
+    function fill() {
+      form.allow.checked = localStorage.getItem('vmi.supplierAllow') !== 'false';
+      form.freq.value = UPLOAD_FREQUENCY[C];
+      show();
+    }
+    form.addEventListener('change', show);
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      localStorage.setItem('vmi.supplierAllow', String(form.allow.checked));
+      const f = JSON.parse(localStorage.getItem('vmi.uploadFreq') || '{}'); f[C] = form.freq.value; localStorage.setItem('vmi.uploadFreq', JSON.stringify(f));
+      flash('Supplier was successfully updated.');
+    });
+    document.getElementById('cancel').addEventListener('click', e => { e.preventDefault(); fill(); });
+    fill();
+  </script>
+</body>
+</html>

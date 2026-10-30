@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Replenishment Report · Vendor Managed Inventory prototype</title>
+  <link rel="stylesheet" href="css/clarity-tokens.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="csp-page ent-page">
+  <main class="csp-main ent">
+    <h1>Replenishment Report</h1>
+    <p class="form-intro" id="run-meta"></p>
+
+    <div class="kpis" id="kpis"></div>
+
+    <section class="csp-card" aria-label="Replenishment run results">
+      <div class="views-row"><span class="current">Run results</span></div>
+      <div class="toolbar">
+        <a class="btn-outline-sm" href="email-replenishment.html">View notification email</a>
+        <a class="btn-primary-sm" href="requisitions.html" style="margin-left:0">Review requisitions</a>
+      </div>
+      <div class="table-scroll" tabindex="0">
+        <table class="items csp-legacy wide">
+          <thead><tr>
+            <th>Item #</th><th>Name</th><th>Warehouse</th><th class="num">Min</th><th class="num">Max</th><th class="num">On Hand</th>
+            <th class="num">Replenishment Qty</th><th>Item Warehouse Supplier</th><th class="num">Vendor Stock (Unrestricted)</th><th>Requisitions Created</th>
+          </tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </section>
+    <p class="hint-note">Vendor stock is checked for the supplier on the item warehouse before requisitions are created. Stock that supplier has reported is requested from them; the rest is created as a requisition without a supplier for the buyer to source. Items whose supplier doesn't report vendor stock get one requisition for the full quantity, as today.</p>
+  </main>
+  <script src="js/app.js"></script>
+  <script src="js/supplier-data.js"></script>
+  <script>
+    renderHeader({ primary: 'Inventory', sub: 'Replenishment' }); renderFooter();
+    const run = replenishmentRun(), all = run.flatMap(l => l.reqs);
+    const withSup = all.filter(r => r.supplier).length;
+    document.getElementById('run-meta').innerHTML = `Run <b>${RUN.id}</b> · ${fmtDateTime(RUN.on)} · Min/Max replenishment · ${run.length} item warehouses below minimum`;
+    document.getElementById('kpis').innerHTML = [['Requisitions created', all.length], ['With supplier', withSup], ['Without supplier (needs sourcing)', all.length - withSup], ['Item warehouses replenished', run.length]]
+      .map(([l, v], i) => `<div class="kpi ${i === 2 && v ? 'warn' : ''}"><span>${l}</span><b>${v}</b></div>`).join('');
+    document.getElementById('rows').innerHTML = run.map(l => `<tr>
+      <td>${esc(l.item)}</td><td class="name">${esc(l.name)}</td><td>${esc(l.warehouse)}</td>
+      <td class="num">${num(l.min)}</td><td class="num">${num(l.max)}</td><td class="num">${num(l.onHand)}</td><td class="num"><b>${num(l.qty)}</b> ${esc(l.uom)}</td>
+      <td>${esc(l.supplier)}${l.vendorStock == null ? '<span class="sub">No vendor stock reported</span>' : '<span class="sub">VMI · reports vendor stock</span>'}</td>
+      <td class="num">${l.vendorStock == null ? '—' : num(l.vendorStock)}</td>
+      <td>${l.reqs.map(r => `<a href="requisitions.html#req-${r.no}" class="req-chip ${r.supplier ? '' : 'nosup'}">Req ${r.no} (${num(r.qty)})${r.supplier ? '' : ' · no supplier'}</a>`).join(' ')}</td>
+    </tr>`).join('');
+  </script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Replenishment notification email · Vendor Managed Inventory prototype</title>
+  <link rel="stylesheet" href="css/clarity-tokens.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="csp-page ent-page">
+  <main class="csp-main ent">
+    <h1>Replenishment notification</h1>
+    <p class="form-intro">Email sent to the warehouse / inventory manager after each replenishment run (extended content for R48).</p>
+    <article class="email" aria-label="Email preview">
+      <header class="email-head">
+        <div><b>From:</b> Coupa &lt;do_not_reply@coupahost.com&gt;</div>
+        <div><b>To:</b> Liem Nguyen (Inventory Manager)</div>
+        <div><b>Subject:</b> <span id="subj"></span></div>
+      </header>
+      <div class="email-body">
+        <img src="assets/coupa-logo-blue.svg" alt="coupa" width="100" height="27">
+        <p>Hello Liem,</p>
+        <p id="lead"></p>
+        <ul class="email-sum" id="sum"></ul>
+        <table class="email-table"><thead><tr><th>Item</th><th>Warehouse</th><th>Replenishment Qty</th><th>Requisitions</th></tr></thead><tbody id="rows"></tbody></table>
+        <p id="action"></p>
+        <p><a class="btn-primary-sm" href="requisitions.html">Review requisitions</a> &nbsp; <a href="replenishment-report.html">View replenishment report</a></p>
+        <p class="muted-sm">You're receiving this because you're the inventory manager for Main Plant.</p>
+      </div>
+    </article>
+  </main>
+  <script src="js/app.js"></script>
+  <script src="js/supplier-data.js"></script>
+  <script>
+    renderHeader({ primary: 'Inventory', sub: 'Replenishment' }); renderFooter();
+    const run = replenishmentRun(), all = run.flatMap(l => l.reqs), withSup = all.filter(r => r.supplier).length;
+    document.getElementById('subj').textContent = `Replenishment run ${RUN.id}: ${all.length} requisitions created (${all.length - withSup} need a supplier)`;
+    document.getElementById('lead').innerHTML = `The replenishment job on ${fmtDateTime(RUN.on)} found <b>${run.length} item warehouses</b> below minimum and created <b>${all.length} draft requisitions</b>. Vendor stock reported by suppliers was checked first.`;
+    document.getElementById('sum').innerHTML = `<li><b>${withSup}</b> requisitions created with a supplier</li><li><b>${all.length - withSup}</b> requisitions created without a supplier — vendor stock didn't cover the full quantity</li>`;
+    document.getElementById('rows').innerHTML = run.map(l => `<tr><td>${esc(l.item)} · ${esc(l.name)}</td><td>${esc(l.warehouse)}</td><td>${num(l.qty)} ${esc(l.uom)}</td>
+      <td>${l.reqs.map(r => `Req ${r.no} (${num(r.qty)})${r.supplier ? ' — ' + esc(r.supplier) : ' — <b>no supplier</b>'}`).join('<br>')}</td></tr>`).join('');
+    document.getElementById('action').textContent = all.length - withSup ? 'Requisitions without a supplier stay in Draft until you assign a supplier and submit them.' : 'All requisitions have a supplier.';
+  </script>
+</body>
+</html>

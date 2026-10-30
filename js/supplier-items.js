@@ -27,6 +27,24 @@ if (!IS_CSP) document.querySelector('.csp-main h1').insertAdjacentHTML('afterend
     }).join('')}
   </nav>`);
 
+// Last upload + next update due (supplier profile frequency) — Stock Balances and Vendor Stock Balances
+function renderUploadStrip() {
+  if (!IS_STOCK) return;
+  document.querySelector('.upload-strip')?.remove();
+  const cust = IS_CSP ? (document.getElementById('customer')?.value || 'Buyer Demo Company') : 'Buyer Demo Company';
+  const u = lastUpload(cust), due = nextUploadDue(cust), freq = UPLOAD_FREQUENCY[cust] || 'Weekly';
+  const today = new Date().toISOString().slice(0, 10), overdue = due && due < today;
+  const html = u
+    ? `<div class="upload-strip ${overdue ? 'overdue' : ''}" role="status">
+        <span><b>Last file upload:</b> ${fmtDateTime(u.on)} by ${esc(u.by)} · ${esc(u.file)} (${u.rows} rows)</span>
+        <span><b>Next update required on:</b> ${fmtDate(due)} <i>(${freq})</i>${overdue ? ' — <b>overdue</b>' : ''}</span>
+      </div>`
+    : `<div class="upload-strip overdue" role="status"><span><b>No stock file uploaded yet.</b> ${IS_CSP ? 'Use ⋮ → Load from file to share your stock levels.' : 'The supplier hasn\'t shared stock levels yet.'}</span><span><b>Update frequency:</b> ${freq}</span></div>`;
+  const before = document.querySelector('.csp-card');
+  before.insertAdjacentHTML('beforebegin', html);
+}
+renderUploadStrip();
+
 const VIEWS = {
   'All': () => true,
   'Low Availability': i => i.atp <= i.reorder,
@@ -48,6 +66,7 @@ const C = {
   reserved: { label: 'Reserved Quantity', num: true },
   atp: { label: IS_STOCK ? 'Unrestricted Quantity' : 'Available to Promise', num: true, html: LOW },
   incoming: { label: 'Incoming Stock Qty', num: true },
+  openPo: { label: 'Open Order Quantity', num: true },
   counted: { label: 'Last Cycle Count Date', html: i => fmtDate(i.counted), csv: i => fmtDate(i.counted) },
   aisle: { label: 'Aisle' }, bin: { label: 'Bin' }, level: { label: 'Level' },
   createdOn: { label: 'Created On', html: i => fmtDateTime(i.createdOn), csv: i => fmtDateTime(i.createdOn) },
@@ -63,7 +82,7 @@ if (CFG.cols === 'ohb') { C.qoh.label = 'Qty'; C.reserved.label = 'Allocated'; C
 const COL_SETS = {
   'csp-items': ['num', 'name', 'warehouse', 'qoh', 'reserved', 'atp', 'counted', 'aisle', 'bin', 'level'],
   stock: ['num', 'name', 'warehouse', 'ouom', 'atp', 'incoming', 'counted', 'aisle', 'bin', 'level', 'createdOn', 'createdBy', 'updatedBy', 'updatedOn'],
-  vendor: ['num', 'name', 'supplier', 'warehouse', 'ouom', 'atp', 'incoming', 'counted', 'aisle', 'bin', 'level', 'createdOn', 'createdBy', 'updatedBy', 'updatedOn'],
+  vendor: ['num', 'name', 'supplier', 'warehouse', 'ouom', 'atp', 'incoming', 'openPo', 'counted', 'aisle', 'bin', 'level', 'createdOn', 'createdBy', 'updatedBy', 'updatedOn'],
   ohb: ['num', 'name', 'warehouse', 'qoh', 'reserved', 'atp', 'ouom', 'price', 'value', 'currency', 'aisle', 'bin', 'level'],
 };
 const COLS = COL_SETS[CFG.cols];
@@ -195,7 +214,7 @@ document.getElementById('views-btn').addEventListener('click', e => {
 
 document.getElementById('filter-btn').addEventListener('click', e => {
   const whs = [...new Set(SEED[state.customer].map(i => i.warehouse))];
-  const m = showMenu(e.currentTarget, `<h4>Warehouse</h4>` + (whs.length ? whs.map(w =>
+  const m = showMenu(e.currentTarget, (CFG.cols === 'vendor' ? `<h4>Supplier</h4><label><input type="checkbox" checked disabled> ${esc(SUPPLIER_NAME)}</label>` : '') + `<h4>Warehouse</h4>` + (whs.length ? whs.map(w =>
     `<label><input type="checkbox" value="${esc(w)}" ${state.warehouses.has(w) ? 'checked' : ''}> ${esc(w)}</label>`).join('')
     : '<label>No warehouses</label>'), 'right');
   m?.addEventListener('change', ev => {
@@ -277,6 +296,7 @@ document.querySelector('.items thead').addEventListener('click', e => {
 document.getElementById('search').addEventListener('input', e => { state.q = e.target.value.trim(); render(); });
 document.getElementById('customer')?.addEventListener('change', e => {
   state.customer = e.target.value;
+  renderUploadStrip();
   state.warehouses.clear();
   closeMenu(); render();
 });

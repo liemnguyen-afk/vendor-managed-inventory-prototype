@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Requisitions · Vendor Managed Inventory prototype</title>
+  <link rel="stylesheet" href="css/clarity-tokens.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="csp-page ent-page">
+  <main class="csp-main ent">
+    <h1>Requisitions</h1>
+    <p class="form-intro">Draft requisitions created by replenishment run <b>RPL-2026-1029-0600</b>. You stay in control: adjust quantities, assign a supplier where needed, then submit. Approved requisitions become purchase orders.</p>
+    <section class="csp-card" aria-label="Requisitions">
+      <div class="views-row"><span class="current">Created by replenishment</span></div>
+      <div class="table-scroll" tabindex="0">
+        <table class="items csp-legacy wide">
+          <thead><tr><th>Req #</th><th>Item</th><th>Warehouse</th><th class="num">Quantity</th><th>Supplier</th><th class="num">Vendor Stock</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <script src="js/app.js"></script>
+  <script src="js/supplier-data.js"></script>
+  <script>
+    renderHeader({ primary: 'Requests', sub: 'Requisitions' }); renderFooter();
+    const KEY = 'vmi.reqs';
+    const saved = () => JSON.parse(localStorage.getItem(KEY) || '{}');
+    const run = replenishmentRun();
+    const SUPPLIERS = ['Northwind Supply Co.', 'Acme Safety Supply', 'Grainger'];
+    function rows() {
+      const s = saved();
+      return run.flatMap(l => l.reqs.map(r => ({ ...l, reqs: undefined, ...r, ...(s[r.no] || {}) })));
+    }
+    function render() {
+      document.getElementById('rows').innerHTML = rows().map(r => {
+        const draft = !r.status || r.status === 'Draft';
+        return `<tr id="req-${r.no}" data-no="${r.no}">
+          <td><b>Req ${r.no}</b><span class="sub">${fmtDateTime(RUN.on)}</span></td>
+          <td class="name">${esc(r.item)} · ${esc(r.name)}</td><td>${esc(r.warehouse)}</td>
+          <td class="num">${draft ? `<input class="inl-qty" data-f="qty" value="${r.qty}" aria-label="Quantity for Req ${r.no}">` : num(r.qty)} ${esc(r.uom)}</td>
+          <td>${draft && !r.supplier ? `<select class="inl-uom" data-f="supplier" aria-label="Supplier for Req ${r.no}"><option value="">Assign supplier…</option>${SUPPLIERS.map(x => `<option>${x}</option>`).join('')}</select>` : esc(r.supplier)}</td>
+          <td class="num">${r.vendorStock == null ? '—' : num(r.vendorStock)}</td>
+          <td>${draft ? '<span class="pill">Draft</span>' : `<span class="pill ok">${esc(r.status)}</span>`}</td>
+          <td>${draft ? `<button class="btn-primary-sm" data-submit>Submit</button>` : esc(r.po || '')}</td>
+        </tr>`;
+      }).join('');
+      const h = location.hash && document.querySelector(location.hash); if (h) h.classList.add('flash-row');
+    }
+    document.getElementById('rows').addEventListener('click', e => {
+      if (!e.target.closest('[data-submit]')) return;
+      const tr = e.target.closest('tr'), no = tr.dataset.no, r = rows().find(x => String(x.no) === no);
+      const qty = tr.querySelector('[data-f=qty]').value.trim(), sup = tr.querySelector('[data-f=supplier]')?.value ?? r.supplier;
+      if (!/^\d+$/.test(qty) || +qty === 0) { toast('Enter a whole quantity greater than 0'); return; }
+      if (!sup) { toast(`Assign a supplier to Req ${no} before submitting`); return; }
+      const s = saved(); s[no] = { qty: +qty, supplier: sup, status: 'Approved', po: `PO ${9000 + Number(no) % 1000}` };
+      localStorage.setItem(KEY, JSON.stringify(s)); render();
+      toast(`Req ${no} approved → ${s[no].po} sent to ${sup}`);
+    });
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Create Stock Location · Coupa Supplier Portal · Vendor Managed Inventory prototype</title>
+  <link rel="stylesheet" href="css/clarity-tokens.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="csp-page">
+  <main class="csp-main">
+    <a class="back-link" href="supplier-stock-locations.html">« Back to Stock Locations</a>
+    <h1>Create Stock Location</h1>
+    <p class="form-intro">Stock locations are specific to the selected customer. Buyer Demo Company will see this location and the stock you report in it (read-only).</p>
+
+    <form id="loc" class="cform" novalidate>
+      <section class="csp-card cform-card">
+        <h2>General</h2>
+        <div class="cgrid">
+          <label class="cf"><span>Customer</span>
+            <select name="customer"><option>Buyer Demo Company</option><option>Coupa Demo Co</option></select></label>
+          <label class="cf"><span>Stock Location Name <em>*</em></span><input name="name" maxlength="80"></label>
+          <label class="cf"><span>Code</span><input name="code" maxlength="8" placeholder="e.g. SLC"></label>
+          <label class="cf wide"><span>Description</span><input name="description"></label>
+          <label class="cf"><span>Supplier Stock Management Type</span>
+            <select name="type"><option value="OWN">OWN — supplier-owned stock</option><option value="SCON">SCON — subcontracting stock</option></select></label>
+          <label class="cf check"><input type="checkbox" name="active" checked> Active</label>
+        </div>
+      </section>
+
+      <section class="csp-card cform-card">
+        <h2>Address</h2>
+        <div class="cgrid">
+          <label class="cf wide"><span>Address Line 1 <em>*</em></span><input name="line1"></label>
+          <label class="cf wide"><span>Address Line 2</span><input name="line2"></label>
+          <label class="cf"><span>City</span><input name="city"></label>
+          <label class="cf"><span>Town</span><input name="town"></label>
+          <label class="cf"><span>State</span><input name="state"></label>
+          <label class="cf"><span>Subdivision ISO Code</span><input name="iso" placeholder="e.g. US-UT"></label>
+          <label class="cf"><span>Postal Code</span><input name="zip"></label>
+          <label class="cf"><span>Attention (vendor contact)</span><input name="attention"></label>
+          <label class="cf"><span>Attention Email</span><input name="email" type="email" placeholder="Used for email notifications"></label>
+          <label class="cf"><span>Tax Registration</span><input name="tax"></label>
+        </div>
+      </section>
+
+      <section class="csp-card cform-card">
+        <h2>Storage Locations <em>*</em></h2>
+        <p class="hint-sm">At least one storage location is required.</p>
+        <table class="items mini-edit">
+          <thead><tr><th>Aisle</th><th>Bin</th><th>Level</th><th>Active</th><th></th></tr></thead>
+          <tbody id="storage"></tbody>
+        </table>
+        <button type="button" class="btn-outline-sm" id="add-row">+ Add storage location</button>
+      </section>
+
+      <div class="cform-actions">
+        <a href="supplier-stock-locations.html" class="btn-text-sm">Cancel</a>
+        <button type="submit" class="btn-primary-sm">Create</button>
+      </div>
+    </form>
+  </main>
+
+  <script src="js/app.js"></script>
+  <script src="js/supplier-data.js"></script>
+  <script>
+    renderCspHeader({ primary: 'Stock Levels', tab: 'Stock Locations' });
+    const form = document.getElementById('loc'), body = document.getElementById('storage');
+    const row = () => body.insertAdjacentHTML('beforeend', `<tr>
+        <td><input class="inl-qty" data-f="aisle" aria-label="Aisle"></td><td><input class="inl-qty" data-f="bin" aria-label="Bin"></td>
+        <td><input class="inl-qty" data-f="level" aria-label="Level"></td><td><input type="checkbox" data-f="active" checked aria-label="Active"></td>
+        <td><button type="button" class="row-act" data-del aria-label="Remove row">✕</button></td></tr>`);
+    row();
+    document.getElementById('add-row').addEventListener('click', () => { row(); body.lastElementChild.querySelector('input').focus(); });
+    body.addEventListener('click', e => { if (e.target.closest('[data-del]') && body.children.length > 1) e.target.closest('tr').remove(); });
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      form.querySelectorAll('.field-error').forEach(el => el.classList.remove('field-error'));
+      const v = Object.fromEntries(new FormData(form)); v.active = form.active.checked;
+      const storage = [...body.querySelectorAll('tr')].map(tr => ({
+        aisle: tr.querySelector('[data-f=aisle]').value.trim(), bin: tr.querySelector('[data-f=bin]').value.trim(),
+        level: tr.querySelector('[data-f=level]').value.trim(), active: tr.querySelector('[data-f=active]').checked })).filter(s => s.aisle || s.bin || s.level);
+      const bad = [];
+      if (!v.name.trim()) bad.push(form.name);
+      if (!v.line1.trim()) bad.push(form.line1);
+      if (!storage.length) bad.push(body.querySelector('input'));
+      const all = JSON.parse(localStorage.getItem('vmi.newStockLocations') || '{}');
+      const existing = [...(STOCK_LOCATIONS[v.customer] || []), ...(all[v.customer] || [])];
+      if (v.name.trim() && existing.some(l => l.name.toLowerCase() === v.name.trim().toLowerCase())) bad.push(form.name);
+      if (bad.length) { bad.forEach(el => el.classList.add('field-error')); bad[0].focus(); toast(existing.some(l => l.name.toLowerCase() === v.name.trim().toLowerCase()) ? 'A stock location with this name already exists for this customer.' : 'Fill in the required fields (*).'); return; }
+      const code = (v.code.trim() || v.name.trim().replace(/[^A-Za-z]/g, '').slice(0, 3)).toUpperCase();
+      const now = new Date(), p = n => String(n).padStart(2, '0');
+      (all[v.customer] = all[v.customer] || []).push({ code, name: v.name.trim(), description: v.description.trim(),
+        address: [v.line1, v.line2, v.city, v.town, v.state, v.zip].map(s => s.trim()).filter(Boolean).join(', '),
+        attention: v.attention.trim(), email: v.email.trim(), tax: v.tax.trim(), type: v.type, active: v.active, createdBy: 'Supplier',
+        createdOn: `${now.getFullYear()}-${p(now.getMonth() + 1)}-${p(now.getDate())}T${p(now.getHours())}:${p(now.getMinutes())}`, storage });
+      localStorage.setItem('vmi.newStockLocations', JSON.stringify(all));
+      sessionStorage.setItem('vmi.locFlash', `Stock location ${v.name.trim()} created for ${v.customer}`);
+      location.href = 'supplier-stock-locations.html';
+    });
+  </script>
+</body>
+</html>

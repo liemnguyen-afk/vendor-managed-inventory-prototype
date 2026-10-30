@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Edit Item — Nitrile Exam Gloves, Medium · Vendor Managed Inventory prototype</title>
+  <link rel="stylesheet" href="css/clarity-tokens.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <main class="classic">
+    <h1>Edit Item</h1>
+    <p class="subject">Nitrile Exam Gloves, Medium <span class="muted">(VMI-10022)</span></p>
+
+    <form id="item" novalidate>
+      <h2>General</h2>
+      <div class="rows">
+        <span class="lbl">Name</span><span>Nitrile Exam Gloves, Medium</span>
+        <span class="lbl">Item Number</span><span>VMI-10022</span>
+        <span class="lbl">Description</span><span>Powder-free nitrile exam gloves, medium, box of 100</span>
+        <span class="lbl">UOM</span><span>BX (Box of 100)</span>
+        <span class="lbl">Commodity</span><span>Personal protective equipment</span>
+      </div>
+
+      <h2>Inventory</h2>
+      <div class="opts">
+        <label><input type="checkbox" name="stockable" checked disabled> Stockable item</label>
+        <label><input type="checkbox" name="lot"> Lot tracked</label>
+        <label><input type="checkbox" name="serial"> Serial tracked</label>
+        <label><input type="checkbox" name="partial"> Allow partial quantity with decimals in Cycle count</label>
+        <label class="new-opt"><input type="checkbox" name="vmi" checked> Allow Supplier to upload stock levels for this item in CSP <span class="new-badge">New · R48</span></label>
+        <span class="hint">Suppliers linked to this item (below) can share their stock levels for it in the Coupa Supplier Portal. Default: No.</span>
+      </div>
+      <div class="rows">
+        <span class="lbl">Consumption UOM</span><span>EA (1 BX = 100 EA)</span>
+      </div>
+
+      <h2>Supplier Items</h2>
+      <table class="dt-classic">
+        <thead><tr><th>Supplier</th><th>Supplier Part #</th><th>Price</th><th>Currency</th><th>Stock upload</th></tr></thead>
+        <tbody id="sup-items"></tbody>
+      </table>
+
+      <div class="form-actions">
+        <a href="#" id="cancel">Cancel</a>
+        <button type="submit" class="btn-save">Save</button>
+      </div>
+    </form>
+  </main>
+
+  <script src="js/app.js"></script>
+  <script>
+    initPage({ primary: 'Setup' });
+    const KEY = 'vmi.itemVmi';
+    const form = document.getElementById('item');
+    const SUP = [['Northwind Supply Co.', 'NW-GLV-NM-100', '18.50', true], ['Acme Safety Supply', 'AC-44120', '19.20', false]];
+    function renderSup() {
+      document.getElementById('sup-items').innerHTML = SUP.map(([s, p, pr, vmiSup]) => `<tr><td>${s}</td><td>${p}</td><td>${pr}</td><td>USD</td>
+        <td>${!form.vmi.checked ? '<span class="muted">Off for this item</span>' : vmiSup ? '<span class="ok-txt">Allowed</span> <span class="muted">(supplier profile allows upload)</span>' : '<span class="muted">Not allowed on supplier profile</span>'}</td></tr>`).join('');
+    }
+    function fill() { form.vmi.checked = localStorage.getItem(KEY) !== 'false'; renderSup(); }
+    form.vmi.addEventListener('change', renderSup);
+    form.addEventListener('submit', e => { e.preventDefault(); localStorage.setItem(KEY, String(form.vmi.checked)); renderSup(); flash('Item was successfully updated.'); });
+    document.getElementById('cancel').addEventListener('click', e => { e.preventDefault(); fill(); });
+    fill();
+  </script>
+</body>
+</html>
