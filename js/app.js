@@ -92,7 +92,7 @@ const SUB_LINKS = {
   Requests: ['Requisitions', 'Requisition Approvals', 'Order Lists'],
 };
 
-function renderHeader({ primary = 'Setup', theme = 'white', sub = null } = {}) {
+function renderHeader({ primary = 'Setup', theme = 'white', sub = null, nav = null } = {}) {
   queueMicrotask(renderProtoNav);
   const subLinks = SUB_LINKS[primary] || SUB_LINKS.Setup;
   const link = (label, selected) => HEADER_HREF[label]
@@ -118,7 +118,7 @@ function renderHeader({ primary = 'Setup', theme = 'white', sub = null } = {}) {
     </div>
     <nav class="gh-nav">
       <a class="home" href="ohb.html" aria-label="Home"><img src="assets/${blue ? 'home-white' : 'home'}.svg" alt=""></a>
-      ${NAV_LINKS[theme].map(l => link(l, l === primary)).join('')}
+      ${(nav || NAV_LINKS[theme]).map(l => link(l, l === primary)).join('')}
     </nav>
     <nav class="gh-subnav">${subLinks.map(l => link(l, l === sub)).join('')}</nav>
   </header>`);

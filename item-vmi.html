@@ -2,66 +2,142 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Edit Item — Nitrile Exam Gloves, Medium · Vendor Managed Inventory prototype</title>
+  <title>Lock,Combination · Item · Vendor Managed Inventory prototype</title>
   <link rel="stylesheet" href="css/clarity-tokens.css">
   <link rel="stylesheet" href="css/styles.css">
 </head>
-<body>
-  <main class="classic">
-    <h1>Edit Item</h1>
-    <p class="subject">Nitrile Exam Gloves, Medium <span class="muted">(VMI-10022)</span></p>
+<body class="shell-blue item-page">
+  <div class="sheet">
+    <main class="itm">
+      <nav class="itm-crumbs" aria-label="Breadcrumb"><a href="#" data-stub>All Items</a><span aria-hidden="true">›</span><span>Lock,Combination</span></nav>
+      <h1>Lock,Combination</h1>
+      <p class="itm-desc">Mechanical Pushbutton Combination Lock, Latch Length 1/2 Inch, Finish Satin Chrome, Standard Access Control, For 1 3/8 to 2 1/4 Inches Thick Wood/Metal Door</p>
 
-    <form id="item" novalidate>
-      <h2>General</h2>
-      <div class="rows">
-        <span class="lbl">Name</span><span>Nitrile Exam Gloves, Medium</span>
-        <span class="lbl">Item Number</span><span>VMI-10022</span>
-        <span class="lbl">Description</span><span>Powder-free nitrile exam gloves, medium, box of 100</span>
-        <span class="lbl">UOM</span><span>BX (Box of 100)</span>
-        <span class="lbl">Commodity</span><span>Personal protective equipment</span>
+      <div class="itm-tabs" role="tablist">
+        <button role="tab" aria-selected="true" data-tab="details">Item Details</button>
+        <button role="tab" aria-selected="false" data-tab="supplier">Supplier Item</button>
       </div>
 
-      <h2>Inventory</h2>
-      <div class="opts">
-        <label><input type="checkbox" name="stockable" checked disabled> Stockable item</label>
-        <label><input type="checkbox" name="lot"> Lot tracked</label>
-        <label><input type="checkbox" name="serial"> Serial tracked</label>
-        <label><input type="checkbox" name="partial"> Allow partial quantity with decimals in Cycle count</label>
-        <label class="new-opt"><input type="checkbox" name="vmi" checked> Allow Supplier to upload stock levels for this item in CSP <span class="new-badge">New · R48</span></label>
-        <span class="hint">Suppliers linked to this item (below) can share their stock levels for it in the Coupa Supplier Portal. Default: No.</span>
-      </div>
-      <div class="rows">
-        <span class="lbl">Consumption UOM</span><span>EA (1 BX = 100 EA)</span>
-      </div>
+      <form id="item" novalidate>
+        <div data-panel="details">
+          <section class="itm-card">
+            <h2>Details</h2>
+            <div class="itm-grid">
+              <div class="fld"><span class="lbl">Item Type</span><span class="val ro">Item</span></div>
+              <div class="fld"><span class="lbl">UOM <em>*</em></span><span class="val">Each</span></div>
+              <div class="fld"><span class="lbl">Commodity</span><span class="val tight">Facilities</span></div>
+              <div class="fld"><span class="lbl">Manufacturer Name</span><span class="val">None</span></div>
+              <div class="fld"><span class="lbl">Manufacturer Part Number</span><span class="val">None</span></div>
+              <div class="fld"><span class="lbl">Item Number</span><span class="val">1U140</span></div>
+              <div class="fld"><span class="lbl">Search Tag</span></div>
+              <div class="fld"><span class="lbl">Supplier View Item Text</span></div>
+              <div class="fld"><span class="lbl">Supplier View Item Number</span></div>
+              <div class="fld"><span class="lbl">Supplier View Item DD</span><span class="val">No data</span></div>
+              <label class="chk"><input type="checkbox" name="svChk"> Supplier View Item ChkBox</label>
+              <div class="fld"><span class="lbl">Supplier View Item Money</span></div>
+              <div class="fld"><span class="lbl">Supplier View Item Attach</span></div>
+              <div class="fld"><span class="lbl">Supplier View Item LkUpUser</span><span class="val tight">None</span></div>
+            </div>
+          </section>
 
-      <h2>Supplier Items</h2>
-      <table class="dt-classic">
-        <thead><tr><th>Supplier</th><th>Supplier Part #</th><th>Price</th><th>Currency</th><th>Stock upload</th></tr></thead>
-        <tbody id="sup-items"></tbody>
-      </table>
+          <section class="itm-card acc"><button type="button" class="acc-head" aria-expanded="false"><h2>Search and Purchasing</h2><span class="chev"></span></button></section>
 
-      <div class="form-actions">
-        <a href="#" id="cancel">Cancel</a>
-        <button type="submit" class="btn-save">Save</button>
-      </div>
-    </form>
-  </main>
+          <section class="itm-card acc open" id="inventory">
+            <button type="button" class="acc-head" aria-expanded="true"><h2>Inventory</h2><span class="chev"></span></button>
+            <div class="acc-body itm-grid inv">
+              <label class="chk"><input type="checkbox" name="inspection" checked> Require Inspection</label>
+              <label class="chk"><input type="checkbox" name="asset"> Enable asset tracking</label>
+              <label class="chk"><input type="checkbox" name="lot"> Enable lot tracking</label>
+              <div class="fld"><span class="lbl">Lot Expiration</span><span class="val ro">Not Required</span></div>
+              <label class="chk"><input type="checkbox" name="rfid"> Require RFID</label>
+
+              <label class="chk"><input type="checkbox" name="barcode"> Require Barcode</label>
+              <div class="fld"><span class="lbl">Receiving Questionnaire</span><span class="val">No data</span></div>
+              <label class="chk"><input type="checkbox" name="catch"> Receive item as catch weight</label>
+              <div class="fld"><span class="lbl">Storage Unit Of Measure <i class="info" title="Unit of measure used for storing this item">i</i></span><span class="val pair"><span>None</span><span>No data</span></span></div>
+              <div class="fld"><span class="lbl">Consumption Unit Of Measure</span><span class="val pair"><span>None</span><span>No data</span></span></div>
+
+              <label class="chk"><input type="checkbox" name="partial"> Allow partial quantity with decimals in Cycle Count</label>
+              <div class="chk-wrap vmi-opt">
+                <label class="chk"><input type="checkbox" name="vmi"> Allow Supplier to upload stock levels for this item in CSP</label>
+                <span class="hint" id="vmi-hint"></span>
+              </div>
+            </div>
+          </section>
+
+          <section class="itm-card acc"><button type="button" class="acc-head" aria-expanded="false"><h2>Sustainability</h2><span class="chev"></span></button></section>
+          <section class="itm-card acc"><button type="button" class="acc-head" aria-expanded="false"><h2>Catch Weight <i class="info lg">i</i> <span class="toggle on" aria-hidden="true"></span></h2><span class="chev"></span></button></section>
+          <section class="itm-card acc"><button type="button" class="acc-head" aria-expanded="false"><h2>Sourcing</h2><span class="chev"></span></button></section>
+          <section class="itm-card acc"><button type="button" class="acc-head" aria-expanded="false"><h2>Additional Information</h2><span class="chev"></span></button></section>
+
+          <div class="itm-history"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f08a24" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9.2"/><path d="M12 7v5.2l3.4 2"/></svg><span>History</span><span class="chev-r"></span></div>
+        </div>
+
+        <div data-panel="supplier" hidden>
+          <section class="itm-card">
+            <h2>Supplier Items</h2>
+            <table class="itm-table">
+              <thead><tr><th>Supplier</th><th>Supplier Part Number</th><th>Price</th><th>Currency</th><th>Stock level upload in CSP</th></tr></thead>
+              <tbody id="sup-items"></tbody>
+            </table>
+          </section>
+        </div>
+
+        <div class="itm-actions">
+          <button type="button" class="btn-primary-sm" id="edit">Edit</button>
+          <button type="button" class="btn-text-sm" id="cancel" hidden>Cancel</button>
+          <button type="submit" class="btn-primary-sm" id="save" hidden>Save</button>
+        </div>
+      </form>
+    </main>
+  </div>
+  <button class="itm-ai" data-stub aria-label="Navi AI assistant"><img src="assets/ai-sparkle.svg" alt=""></button>
 
   <script src="js/app.js"></script>
   <script>
-    initPage({ primary: 'Setup' });
+    initPage({ theme: 'blue', primary: 'Setup', nav: ['Expenses', 'Requests', 'Orders', 'Agreements', 'Invoices', 'Payments', 'Agent Studio', 'Inventory',
+      'Sourcing', 'Suppliers', 'Contracts', 'Spend Guard', 'Setup', 'More...'] }, { logo: false });
     const KEY = 'vmi.itemVmi';
     const form = document.getElementById('item');
-    const SUP = [['Northwind Supply Co.', 'NW-GLV-NM-100', '18.50', true], ['Acme Safety Supply', 'AC-44120', '19.20', false]];
-    function renderSup() {
-      document.getElementById('sup-items').innerHTML = SUP.map(([s, p, pr, vmiSup]) => `<tr><td>${s}</td><td>${p}</td><td>${pr}</td><td>USD</td>
-        <td>${!form.vmi.checked ? '<span class="muted">Off for this item</span>' : vmiSup ? '<span class="ok-txt">Allowed</span> <span class="muted">(supplier profile allows upload)</span>' : '<span class="muted">Not allowed on supplier profile</span>'}</td></tr>`).join('');
+    // Supplier items for this item; the second flag = supplier profile allows stock upload (Edit Supplier page)
+    const SUP = [['Northwind Supply Co.', 'NW-LCK-1U140', '214.00', true], ['Grainger', '1U140', '229.50', false]];
+    const supAllowed = () => localStorage.getItem('vmi.supplierAllow') !== 'false';
+    function render() {
+      const on = form.vmi.checked;
+      document.getElementById('vmi-hint').textContent = on
+        ? 'Yes — suppliers linked to this item can share its stock levels in the Coupa Supplier Portal.'
+        : 'Default: No. When Yes, suppliers linked to this item can share its stock levels in the Coupa Supplier Portal.';
+      document.getElementById('sup-items').innerHTML = SUP.map(([s, p, pr, vmiSup], i) => {
+        const allowed = vmiSup && (i > 0 || supAllowed());
+        return `<tr><td>${s}</td><td>${p}</td><td>${pr}</td><td>USD</td>
+          <td>${!on ? '<span class="muted">No — off for this item</span>' : allowed ? '<span class="ok-txt">Yes</span>' : '<span class="muted">No — not allowed on the supplier profile</span>'}</td></tr>`;
+      }).join('');
     }
-    function fill() { form.vmi.checked = localStorage.getItem(KEY) !== 'false'; renderSup(); }
-    form.vmi.addEventListener('change', renderSup);
-    form.addEventListener('submit', e => { e.preventDefault(); localStorage.setItem(KEY, String(form.vmi.checked)); renderSup(); flash('Item was successfully updated.'); });
-    document.getElementById('cancel').addEventListener('click', e => { e.preventDefault(); fill(); });
-    fill();
+    function setEditing(on) {
+      form.classList.toggle('editing', on);
+      form.querySelectorAll('input').forEach(i => { i.disabled = !on; });
+      document.getElementById('edit').hidden = on;
+      document.getElementById('cancel').hidden = document.getElementById('save').hidden = !on;
+    }
+    function fill() { form.vmi.checked = localStorage.getItem(KEY) === 'true'; render(); }
+
+    form.vmi.addEventListener('change', render);
+    document.getElementById('edit').addEventListener('click', () => {
+      setEditing(true);
+      const inv = document.getElementById('inventory'); inv.classList.add('open'); inv.querySelector('.acc-head').setAttribute('aria-expanded', 'true');
+    });
+    document.getElementById('cancel').addEventListener('click', () => { form.reset(); fill(); setEditing(false); });
+    form.addEventListener('submit', e => { e.preventDefault(); localStorage.setItem(KEY, String(form.vmi.checked)); render(); setEditing(false); toast('Item was successfully updated.'); });
+
+    document.querySelectorAll('.acc-head').forEach(h => h.addEventListener('click', () => {
+      const sec = h.closest('.acc'); if (!sec.querySelector('.acc-body')) return toast('This section is not part of the prototype');
+      const open = sec.classList.toggle('open'); h.setAttribute('aria-expanded', String(open));
+    }));
+    document.querySelectorAll('[data-tab]').forEach(t => t.addEventListener('click', () => {
+      document.querySelectorAll('[data-tab]').forEach(x => x.setAttribute('aria-selected', String(x === t)));
+      document.querySelectorAll('[data-panel]').forEach(p => { p.hidden = p.dataset.panel !== t.dataset.tab; });
+    }));
+    fill(); setEditing(false);
   </script>
 </body>
 </html>
