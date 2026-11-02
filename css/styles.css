@@ -507,8 +507,9 @@ table.mini th { color: var(--cui-color-text-t3); font-weight: var(--cui-font-wei
 .items tr.flash-row td { background: var(--cui-color-s1-surface-selectedSubtle); }
 
 /* ---------------------------------------------------------------- Item page (Setup → Items → item; Clarity card layout) */
-body.item-page .classic-foot { font-family: var(--hdr-font); border-top: 0; padding-top: 48px; }
-body.item-page .sheet { border-bottom-width: 3px; }
+body.item-page .classic-foot { font-family: var(--hdr-font); }
+body.item-page.shell-blue .classic-foot { border-top: 0; padding-top: 48px; }
+body.item-page:not(.shell-blue) .sheet { border-bottom: 0; }
 .itm { padding: 30px 44px 0; font-family: var(--cui-font-family-control); color: var(--cui-color-text-t1); }
 .itm-crumbs { display: flex; align-items: center; gap: var(--cui-space-2xl); font-size: 14px; color: var(--cui-color-text-t2); }
 .itm-crumbs a { color: var(--cui-color-text-link); }

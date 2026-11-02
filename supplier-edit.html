@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="css/clarity-tokens.css">
   <link rel="stylesheet" href="css/styles.css">
 </head>
-<body class="shell-blue item-page">
+<body class="item-page">
   <div class="sheet">
     <main class="classic se">
       <h1>Super Printers <small>Edit</small></h1>
@@ -29,8 +29,8 @@
 
   <script src="js/app.js"></script>
   <script>
-    initPage({ theme: 'blue', primary: 'Suppliers', nav: ['Expenses', 'Requests', 'Orders', 'Agreements', 'Invoices', 'Payments', 'Agent Studio', 'Inventory',
-      'Sourcing', 'Suppliers', 'Contracts', 'Spend Guard', 'Setup', 'More...'] }, { logo: false });
+    // White header as on Inventory Settings; Suppliers takes Contingent Workforce's slot so the selected tab fits
+    initPage({ theme: 'white', primary: 'Suppliers', nav: ['Expenses', 'Forecasts', 'Requests', 'Orders', 'Suppliers', 'Invoices', 'Spend Pulse', 'Payments', 'Spend Guard', 'Inventory', 'Setup', 'More...'] });
 
     /* Orange outline section icons (classic Coupa) */
     const O = 'fill="none" stroke="#f08a24" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"';
