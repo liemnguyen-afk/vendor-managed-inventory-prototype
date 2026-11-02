@@ -19,6 +19,7 @@ const PROTO_SCREENS = [
     ['inventory-settings.html', 'Inventory Settings — Allow Vendor Managed Inventory'],
     ['item-vmi.html', 'Item — Allow Supplier to upload stock levels'],
     ['supplier-vmi.html', 'Supplier profile — stock upload + frequency'],
+    ['supplier-edit.html', 'Edit Supplier (Super Printers) — Supply Chain Collaboration'],
     ['warehouse.html', 'Warehouse — Laughlin Nevada'],
     ['warehouse-create.html', 'Create Warehouse'],
   ]],
@@ -90,6 +91,8 @@ const SUB_LINKS = {
   Setup: ['All Setup Items', 'Company Info', 'Accounts', 'Users', 'Approvals', 'Budget Periods', 'Budget Lines'],
   Inventory: ['Overview', 'Workbench', 'On-Hand Balances', 'Replenishment', 'Fulfillment', 'Picklists'],
   Requests: ['Requisitions', 'Requisition Approvals', 'Order Lists'],
+  Suppliers: ['Suppliers', 'Supplier Information', 'Certificates', 'Diversity', 'Risk Aware', 'Performance', 'Risk Assess',
+    'Supplier Sites', 'Catalogs', 'Supplier Portal Directory', 'Insights'],
 };
 
 function renderHeader({ primary = 'Setup', theme = 'white', sub = null, nav = null } = {}) {

@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Super Printers · Edit Supplier · Vendor Managed Inventory prototype</title>
+  <link rel="stylesheet" href="css/clarity-tokens.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="shell-blue item-page">
+  <div class="sheet">
+    <main class="classic se">
+      <h1>Super Printers <small>Edit</small></h1>
+      <a class="se-tag" href="#" data-stub><svg width="20" height="18" viewBox="0 0 20 18"><path d="M2 2h7l8 8-7 7-8-8z" fill="#1d91d8"/><circle cx="5.5" cy="5.5" r="1.4" fill="#fff"/><circle cx="14.5" cy="13.5" r="4.2" fill="#3aa757" stroke="#fff"/><path d="M14.5 11.4v4.2M12.4 13.5h4.2" stroke="#fff" stroke-width="1.4"/></svg>Add Tag</a>
+      <form id="sup" novalidate>
+        <div class="se-cols">
+          <div class="se-col" id="left"></div>
+          <div class="se-col" id="right"></div>
+        </div>
+        <div id="tables"></div>
+        <div class="se-actions">
+          <a href="#" id="cancel">Cancel</a>
+          <button type="button" class="se-btn del" data-stub><span class="x">✕</span>Delete</button>
+          <button type="submit" class="se-save">Save</button>
+        </div>
+        <div class="se-history"><span class="ic" data-ic="clock"></span>History<span class="chev-r"></span></div>
+      </form>
+    </main>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    initPage({ theme: 'blue', primary: 'Suppliers', nav: ['Expenses', 'Requests', 'Orders', 'Agreements', 'Invoices', 'Payments', 'Agent Studio', 'Inventory',
+      'Sourcing', 'Suppliers', 'Contracts', 'Spend Guard', 'Setup', 'More...'] }, { logo: false });
+
+    /* Orange outline section icons (classic Coupa) */
+    const O = 'fill="none" stroke="#f08a24" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"';
+    const IC = {
+      doc: `<svg width="26" height="26" viewBox="0 0 26 26" ${O}><path d="M5 3h10l4 4v9M5 3v19h8"/><path d="M8 9h7M8 13h5"/><circle cx="18" cy="19" r="3.6"/><path d="M20.6 21.6L23 24"/></svg>`,
+      gear: `<svg width="26" height="26" viewBox="0 0 26 26" ${O}><circle cx="13" cy="13" r="3.5"/><path d="M13 3.5v3M13 19.5v3M3.5 13h3M19.5 13h3M6.3 6.3l2.1 2.1M17.6 17.6l2.1 2.1M6.3 19.7l2.1-2.1M17.6 8.4l2.1-2.1"/></svg>`,
+      gears: `<svg width="28" height="26" viewBox="0 0 28 26" ${O}><circle cx="10" cy="10" r="3"/><path d="M10 3v2.5M10 14.5V17M3 10h2.5M14.5 10H17M5 5l1.8 1.8M13.2 13.2L15 15M5 15l1.8-1.8M13.2 6.8L15 5"/><circle cx="21" cy="19" r="2.6" fill="#f08a24"/></svg>`,
+      tag: `<svg width="26" height="26" viewBox="0 0 26 26" ${O}><path d="M3 4h9l11 11-8 8L4 12z"/><circle cx="8" cy="8.5" r="1.6"/></svg>`,
+      person: `<svg width="22" height="28" viewBox="0 0 22 28" ${O}><path d="M5 9c0-4 2.5-6 6-6s6 2 6 6-2.6 7-6 7-6-3-6-7z"/><path d="M5 8c2-2.5 9-2.5 12 0" fill="#f08a24"/><path d="M8.5 10h.01M13.5 10h.01M9 13c1 .8 3 .8 4 0M7 17l4 9 4-9"/></svg>`,
+      people: `<svg width="30" height="28" viewBox="0 0 30 28" ${O}><path d="M11 9c0-4 2.5-6 6-6s6 2 6 6-2.6 7-6 7-6-3-6-7zM11 8c2-2.5 9-2.5 12 0M13 17l4 8 4-8"/><circle cx="6" cy="19" r="2.6" fill="#f08a24"/><path d="M1.5 27c.5-3 2-4.5 4.5-4.5s4 1.5 4.5 4.5" fill="#f08a24"/></svg>`,
+      robot: `<svg width="26" height="28" viewBox="0 0 26 28" ${O}><path d="M6 9c0-4 2.7-6 6.5-6S19 5 19 9s-2.8 7-6.5 7S6 13 6 9zM6 8c2-2.5 9-2.5 13 0"/><circle cx="19" cy="20" r="4"/><path d="M19 17.5V20l1.6 1"/></svg>`,
+      pin: `<svg width="22" height="28" viewBox="0 0 22 28" ${O}><path d="M11 25s8-8.5 8-14a8 8 0 00-16 0c0 5.5 8 14 8 14z"/><circle cx="11" cy="11" r="3"/></svg>`,
+      card: `<svg width="34" height="24" viewBox="0 0 34 24" ${O}><rect x="2" y="3" width="30" height="18" rx="2"/><path d="M2 8h30M2 11h30" stroke-width="1.8"/><path d="M6 16h8M6 18.5h5"/></svg>`,
+      channels: `<svg width="32" height="24" viewBox="0 0 32 24" ${O}><circle cx="7" cy="13" r="5"/><path d="M12 6h17M14 10h15M12 14h17M14 18h15"/></svg>`,
+      diversity: `<svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="#e8671c" stroke-width="2.4" stroke-linecap="round"><path d="M4 4l7 7M22 4l-7 7M4 22l7-7M22 22l-7-7M13 3v6M13 17v6M3 13h6M17 13h6"/></svg>`,
+      clock: `<svg width="26" height="26" viewBox="0 0 26 26" ${O}><circle cx="13" cy="13" r="10"/><path d="M13 7v6.5h4.5"/></svg>`,
+    };
+    document.querySelectorAll('[data-ic]').forEach(e => { e.innerHTML = IC[e.dataset.ic]; });
+
+    /* Field helpers: [label, type, value, opts] */
+    const caret = '<svg class="cv" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#333" stroke-width="1.6" stroke-linecap="round"><path d="M3 4.5l3 3 3-3"/></svg>';
+    const ctl = (type, v = '', o = {}) => {
+      const w = o.w ? ` style="width:${o.w}px${o.h ? `;height:${o.h}px` : ''}"` : '';
+      if (type === 'text') return `<input class="se-in${o.dis ? ' dis' : ''}"${w} value="${esc(v)}"${o.dis ? ' disabled' : ''}${o.ph ? ` placeholder="${o.ph}"` : ''}>`;
+      if (type === 'select') return `<span class="se-sel${o.dis ? ' dis' : ''}${o.split ? ' split' : ''}"${w}><span>${esc(v)}</span>${caret}</span>`;
+      if (type === 'check') return `<input type="checkbox" class="se-chk"${v ? ' checked' : ''}${o.dis ? ' disabled' : ''}>`;
+      if (type === 'area') return `<textarea class="se-in"${w}></textarea>`;
+      if (type === 'file') return `<span class="se-file"><span class="b">Choose File</span>No file chosen</span>`;
+      if (type === 'tags') return `<span class="se-tags${o.blue ? ' blue' : ''}"${w}>${v.map(t => `<span class="t">${esc(t)}<b>${o.blue ? 'x' : '✕'}</b></span>`).join('')}</span>`;
+      if (type === 'html') return v;
+      return esc(v);
+    };
+    const row = ([label, type, v, o = {}]) => `<div class="se-row${o.top ? ' top' : ''}"><label>${o.req ? '<em>*</em> ' : ''}${label}${o.info ? ' <i class="se-i">i</i>' : ''}</label>
+      <div class="se-ctl">${ctl(type, v, o)}${o.hint ? `<div class="se-hint">${o.hint}</div>` : ''}</div></div>`;
+    const sec = (title, icon, body, o = {}) => `<section class="se-sec${o.cls ? ' ' + o.cls : ''}"><h2>${icon ? `<span class="ic">${IC[icon]}</span>` : ''}${title}${o.info ? ' <i class="se-i lg">i</i>' : ''}</h2>${body}</section>`;
+    const rows = list => list.map(row).join('');
+
+    document.getElementById('left').innerHTML = [
+      sec('Name &amp; Relationship', 'doc', rows([
+        ['Name', 'text', 'Super Printers', { req: true }], ['Display Name', 'text'], ['Status', 'select', 'Active', { w: 78 }],
+        ['Enterprise', 'select', 'Global Enterprise', { w: 133 }], ['Supplier Number', 'text'], ['Parent Company Type', 'select', 'Supplier', { w: 122 }],
+        ['Parent Company', 'text', '', { hint: 'Only one parent company is allowed.' }], ['Account Number', 'text'],
+        ['Logo', 'file', '', { hint: 'Logo will be scaled to 150 x 50 pixels and should be a jpg or png' }], ['On Hold', 'check'], ['Website', 'text'],
+        ['Country/Region of Operation', 'select', '', { w: 284 }], ['DUNS', 'text'], ['Tax', 'text'], ['Scope Three Emissions?', 'check', false, { top: 1 }],
+        ['One Time Supplier', 'check'], ['Community Enablement', 'select', 'Yes', { w: 152 }], ['Strategic Supplier', 'check']])),
+      sec('Online Store', 'tag', rows([['URL', 'text'], ['Login', 'text'], ['Shared Key', 'text'],
+        ['Purchaser', 'select', 'Requester', { w: 92, dis: 1, hint: 'Can be made editable in <a href="#" data-stub>Company Setup</a>.' }]])),
+      sec('Supplier Contact', 'person', '<p class="se-p">Contacts can be edited in the <a href="#" data-stub>Supplier Contacts table</a></p>'),
+      sec('Primary Address', 'pin', '<p class="se-p">Addresses can be edited in the <a href="#" data-stub>Supplier Addresses table</a></p>'),
+      sec('Tax Registrations', null, '<a class="se-add" href="#" data-stub><span class="plus">+</span>Add Tax Registration</a>'),
+      sec('Data Sharing', 'gears', `<p class="se-p">Select how information should be shared with child records.</p>${row(['Inherent and Residual Risk Scores', 'html',
+        `<div class="se-radios"><label><input type="radio" name="ds" checked> Use default setting</label><div class="se-hint tight">Current setting: Do not share with children</div>
+         <label><input type="radio" name="ds"> Override default and always share</label><label><input type="radio" name="ds"> Override default and never share</label></div>`, { top: 1 }])}`),
+      sec('Content Groups', 'people', row(['Who can see this supplier?', 'html',
+        `<div class="se-radios cg"><label><input type="radio" name="cg"> <svg width="20" height="18" viewBox="0 0 20 18"><circle cx="11" cy="5" r="4" fill="#3aa757"/><path d="M4 17c.5-4.5 3-7 7-7s6.5 2.5 7 7z" fill="#3aa757"/><circle cx="5" cy="7" r="3" fill="#1d91d8"/></svg> Everyone</label>
+         <label><input type="radio" name="cg" checked> Only members of these content groups</label>${ctl('tags', ['Scientists'], { w: 207 })}</div>`, { top: 1 }])),
+    ].join('');
+
+    const ch = n => `<tr><td>${n}</td><td class="red">Not Available</td><td class="red">Not Enabled</td></tr>`;
+    document.getElementById('right').innerHTML = [
+      sec('PO Transmission', 'gear', rows([
+        ['PO Method', 'select', 'Prompt', { w: 97 }], ['PO Change Method', 'select', 'Prompt', { w: 97 }], ['Buyer Hold', 'check'], ['Language', 'select', 'English', { w: 101 }],
+        ['Regional Formatting', 'select', 'United States', { w: 217 }], ['PO Email', 'text', 'upgrade@coupa.com'], ['PO URL', 'text'], ['Our domain', 'text'], ['Our identity', 'text'],
+        ['Supplier domain', 'text'], ['Supplier identity', 'text'], ['Shared secret', 'text'], ['Protocol', 'text'],
+        ['SSL Version', 'select', '', { w: 85, hint: 'Leave blank to use latest version available. Change to override' }],
+        ['Disable SSL Cert Verification', 'check', false, { top: 1, hint: 'Check to ignore SSL certificate mismatch error' }],
+        ['Enable Mutual TLS for PO cXML', 'check', false, { top: 1, hint: 'Confirm supplier readiness prior to enablement' }],
+        ['Basic Auth User', 'text'], ['Basic Auth Password', 'text']])),
+      sec('Supply Chain Collaboration', 'robot', rows([
+        ['Order Confirmation Level', 'select', 'Not Applicable', { w: 141, top: 1 }], ['Confirm By (In Hours)', 'text', '', { dis: 1 }],
+        ['Allow partial order responses by supplier', 'check', false, { dis: 1, top: 1 }], ['Allow supplier to propose item substitutes', 'check', false, { dis: 1, top: 1 }],
+        ['Allow confirmation for Amount/Service Lines', 'check', false, { top: 1 }], ['Allow Header Detail Confirmation by Supplier', 'check', false, { dis: 1, top: 1 }],
+        ['cXML Product Activity Message', 'check', false, { top: 1 }]]) +
+        `<div class="se-vmi">${row(['Allow Supplier to upload Stock levels', 'html', '<input type="checkbox" class="se-chk" id="vmi-allow" checked>', { top: 1 }])}
+        ${row(['Update frequency', 'html', `<span class="se-sel" style="width:110px"><span id="freq-txt">Weekly</span>${caret}<select class="se-native" id="freq" aria-label="Update frequency">
+          <option>Daily</option><option selected>Weekly</option><option>Monthly</option></select></span>`,
+          { hint: 'How often the supplier must upload stock levels in the Coupa Supplier Portal. Buyers see when the next update is due.' }])}</div>`),
+      sec('Payments', 'card', rows([['Payment Method', 'select', 'Invoice', { w: 105 }], ['Payment Terms', 'select', 'Net 30', { w: 100 }],
+        ['Payment Types', 'tags', ['Virtual Card', 'Bank Transfer', 'Check'], { w: 280, h: 56, top: 1 }], ['Enable Single Payment per Invoice', 'check', false, { info: 1, top: 1 }]])),
+      sec('Available Channels', 'channels', `<div class="se-insights"><span class="g">${IC.gear.replace(/#f08a24/g, '#1d91d8')}</span>Insights powered by Community.ai<span class="ghost">$8%</span></div>
+        <table class="se-ch"><thead><tr><th></th><th>Community</th><th>You</th></tr></thead><tbody>
+        ${['cXML Integration', 'sFTP Integration', 'Coupa Supplier Portal', 'Supplier Actionable Notification', 'Invoice Inbox'].map(ch).join('')}</tbody></table>`, { info: 1 }),
+      sec('Invoicing', 'channels', row(['Configurations', 'html', `<div class="se-checks">${['Allow cXML for Invoicing and Advanced Ship Notices', 'Hold Invoices for AP Review',
+        'Always Route Invoices From This Supplier For Approval', 'Create Invoices with No Backing Document', 'Allow Non-Backed Lines on PO Invoices',
+        'Create Credit Notes without Backing Invoice'].map(t => `<label><input type="checkbox" class="se-chk"> ${t}</label>`).join('')}</div>`, { top: 1 }])),
+      sec('Invoice Inbox', 'channels', `<p class="se-p">Invoices sent from these email addresses will be put into the Invoice Inbox.</p>
+        <div class="se-bar"><span>Email</span><span>Notification</span><span>Actions</span></div>
+        <div class="se-right"><a class="se-add" href="#" data-stub><span class="plus">+</span>Add Email</a></div>
+        <p class="se-p">Invoices received from the email addresses of this domain (ex. example.com) will be sent to the Invoice Inbox</p>
+        ${row(['Email domain', 'html', `<span class="at">@</span>${ctl('text')}`])}
+        <p class="se-p tight">Set a reply-to email address for all invoices from this supplier.</p>${row(['Default contact email', 'text'])}`),
+      sec('Additional Settings', 'gears', rows([['Preferred Commodities', 'tags', ['IT', 'Business Card', 'Print'], { w: 308, h: 60, top: 1, blue: 1 }],
+        ['Default Commodity', 'select', 'IT', { w: 173, split: 1 }], ['Default Currency', 'select', '', { w: 60 }],
+        ['Government Allegation Fraud and Bribery Indicator', 'check', false, { top: 1 }], ['Government Allegation for Fraud and Bribery', 'area', '', { w: 173, h: 92, top: 1 }],
+        ['Service Sheet Required', 'select', 'No', { w: 152 }], ['Invoice Matching Level', 'select', '2-way', { w: 104 }], ['Shipping', 'select', '', { w: 90 }],
+        ['Tax Code', 'select', '', { w: 235 }], ['Savings (%)', 'text', '5.000'], ['Chart of Accounts', 'text', '', { w: 250, ph: 'Select COAs' }],
+        ['Supplier Diversity', 'select', '', { w: 243 }]])),
+      sec('Coupa Supplier Portal', 'person', `${row(['Connection Status', 'html', '<span class="unl">Unlinked</span> <a href="#" data-stub>Send Invitation</a>'])}
+        ${row(['Allow Supplier to:', 'html', `<div class="se-checks sm">${[['Create Invoices', 1], ['Create ASNs'], ['View Receipts'], ['Request Change Orders'], ['Choose Billing Account'], ['Update Punchout Details']]
+          .map(([t, c]) => `<label><input type="checkbox" class="se-chk"${c ? ' checked' : ''}> ${t}</label>`).join('')}</div>`, { top: 1 }])}
+        <div class="se-csp"><button type="button" class="se-btn" data-stub>Request Info</button><div class="lr"><b>Last Requested</b> None</div><button type="button" class="se-btn" data-stub>Update Info</button></div>`),
+      ...['Supplier Classification', 'Enterprise Supplier Data', 'Insurance', 'Risk', 'Tax'].map(t => `<button type="button" class="se-coll" data-stub>${t}<span class="chev"></span></button>`),
+    ].join('');
+
+    /* Full-width tables */
+    const search = '<label class="se-search"><input placeholder="Search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg></label>';
+    const tools = '<span class="se-tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.6" stroke-linejoin="round"><path d="M3 4h18l-7 8.5V19l-4 2v-8.5z"/></svg></span><span class="se-tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="#333"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></span>';
+    const pencil = '<svg width="18" height="18" viewBox="0 0 24 24"><path d="M4 20l1-4.5L16 4.5l3.5 3.5L8.5 19z" fill="#e8890c"/><path d="M4 20l1-4.5 3.5 3.5z" fill="#3b2a12"/></svg>';
+    const table = (title, icon, { views = true, create = true, filters = true, cols, rows: data = [], pager = data.length > 0, align = [] }) => `
+      <section class="se-tsec"><h2><span class="ic">${IC[icon]}</span>${title}</h2>
+      <div class="se-tcard">
+        ${views ? '<div class="se-views"><span class="vb"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></svg>Views</span><b>All</b></div>' : ''}
+        <div class="se-tbar">${create ? '<button type="button" class="se-btn" data-stub>Create</button>' : ''}<span class="sp"></span>${search}${filters ? tools : ''}</div>
+        <table class="se-t"><thead><tr>${cols.map((c, i) => `<th${align[i] ? ` style="${align[i]}"` : ''}>${c}</th>`).join('')}</tr></thead>
+        <tbody>${data.length ? data.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('') : `<tr><td class="none" colspan="${cols.length}">No results found</td></tr>`}</tbody></table>
+        ${pager ? '<div class="se-pager">Per page <b>15</b> <i>|</i> <a href="#" data-stub>45</a> <i>|</i> <a href="#" data-stub>90</a></div>' : ''}
+      </div></section>`;
+    document.getElementById('tables').innerHTML = [
+      table('Supplier Contacts', 'person', { cols: ['Id', 'Name', 'Email', 'Phone', 'Contact Purpose', 'Primary', 'Addresses', 'Connected with CSP', 'Last Login Date'],
+        rows: [['<a href="#" data-stub>2</a>', 'Bob<br>Mintro', 'harish.sharma+2gb@coupa.com', '<span class="g">None</span>', '<span class="g">None</span>', 'Yes', '0', 'No', 'None']] }),
+      table('Supplier Account Owners', 'person', { views: false, filters: false, cols: ['Id', 'Email', 'Contact Name', 'Contact Purposes', 'Actions'],
+        align: ['padding-left:70px', '', 'padding-left:90px', 'padding-left:150px', 'padding-left:180px'] }),
+      '<p class="se-p disc">Disclaimer: The name and email address of the Supplier Account Owner(s) will be displayed to the supplier in the Coupa supplier portal.</p>',
+      table('Supplier Integration Contacts', 'person', { views: false, filters: false, cols: ['Email', 'Contact Name', 'Actions'], align: ['width:540px', 'width:210px', ''] }),
+      table('Supplier Addresses', 'pin', { cols: ['Id', 'Line 1', 'Line 2', 'City', 'State', 'Postal Code', 'Country/Region', 'Address Purpose', 'Primary', 'Contacts', 'Actions'],
+        rows: [['<a href="#" data-stub class="c">2</a>', '89992<br>Mission<br>Street', '<span class="g">None</span>', 'Charleston', 'VA', '90233', 'United States', '<span class="g">None</span>', 'Yes', '0', pencil]] }),
+      table('Supplier Diversity', 'diversity', { create: false, cols: ['Id', 'Category', 'Subcategory', 'Country/Region'], align: ['padding-left:90px', 'width:200px', 'width:260px', ''] }),
+      table('Supplier Sites', 'gears', { cols: ['Code', 'Name', 'Description', 'Active', 'Content Groups', 'Request Change Orders', 'Actions'] }),
+    ].join('');
+
+    // VMI: update frequency applies only when the supplier may upload stock levels (kept per page — Super Printers isn't the VMI sample supplier)
+    const KEY = 'vmi.superPrintersVmi', allow = document.getElementById('vmi-allow'), freq = document.getElementById('freq');
+    const saved = JSON.parse(localStorage.getItem(KEY) || '{"allow":true,"freq":"Weekly"}');
+    const syncVmi = () => { document.getElementById('freq-txt').textContent = freq.value; freq.disabled = !allow.checked; freq.parentElement.classList.toggle('dis', !allow.checked); };
+    allow.checked = saved.allow; freq.value = saved.freq; syncVmi();
+    allow.addEventListener('change', syncVmi); freq.addEventListener('change', syncVmi);
+    const form = document.getElementById('sup');
+    form.addEventListener('submit', e => { e.preventDefault(); localStorage.setItem(KEY, JSON.stringify({ allow: allow.checked, freq: freq.value })); toast('Supplier was successfully updated.'); });
+    document.getElementById('cancel').addEventListener('click', e => { e.preventDefault(); location.reload(); });
+  </script>
+</body>
+</html>
