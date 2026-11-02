@@ -1,0 +1,26 @@
+css/styles.css
+  s_623fc2d8ecca21::t_4491a36429b7eb 510-511
+  s_623fc2d8ecca21::t_cde3c538400f3b 512
+supplier-edit.html
+  s_623fc2d8ecca21::t_4491a36429b7eb 9,32-33
+item-vmi.html
+  s_623fc2d8ecca21::t_4491a36429b7eb 9,98
+README.md
+  s_623fc2d8ecca21::t_927f1090134841 50,52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d4cc2c0848a954955ebd07f2f095c829663c5a49",
+  "prompts": {},
+  "sessions": {
+    "s_623fc2d8ecca21": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "391a6901-7741-4bdf-9322-0d45d37af900",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "liemnguyen-afk <301846626+liemnguyen-afk@users.noreply.github.com>"
+    }
+  }
+}
