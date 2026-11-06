@@ -26,24 +26,34 @@
         </button>
         <span class="current">All</span>
       </div>
-      <div class="toolbar">
-        <a class="btn-primary-sm" href="supplier-stock-location-new.html">Create</a>
+      <div class="toolbar sl-toolbar">
+        <a class="btn-outline-sm sl-create" href="supplier-stock-location-new.html">Create</a>
+        <span class="sl-spacer"></span>
         <label class="tb-search csp-legacy">
           <input id="search" placeholder="Search" aria-label="Search stock locations">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg>
         </label>
+        <button class="tb-btn" data-stub aria-label="Filter">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M7 12h10M10 17h4"/></svg>
+        </button>
         <button class="tb-btn" id="more-btn" aria-label="More actions" aria-haspopup="menu" aria-expanded="false">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>
         </button>
       </div>
-      <div class="table-scroll" tabindex="0" aria-label="Stock locations table">
-        <table class="items csp-legacy wide">
+      <div id="table-wrap" class="table-scroll" tabindex="0" aria-label="Stock locations table">
+        <table class="items csp-legacy wide sl-table">
           <thead><tr>
-            <th>Stock Location</th><th>Description</th><th>Address</th><th>Attention</th><th>Stock Management Type</th>
-            <th class="num">Storage Locations</th><th>Created By</th><th>Active</th><th class="act">Actions</th>
+            <th>Name</th><th>Description</th><th>Type</th><th>Active</th><th>Address</th>
+            <th>Created By</th><th>Created Date</th><th>Last Updated By</th><th>Last Updated Date</th><th class="act">Actions</th>
           </tr></thead>
           <tbody id="rows"></tbody>
         </table>
+      </div>
+      <div id="zero" class="sl-zero" hidden>
+        <svg width="72" height="72" viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M10 28L36 14l26 14v30H10z"/><path d="M22 58V38h28v20M22 46h28M30 38v20M42 38v20"/></svg>
+        <h2>No stock locations yet</h2>
+        <p>Create a stock location for <b id="zero-cust"></b> to start sharing the stock you hold for this customer.</p>
+        <a class="btn-primary-sm" href="supplier-stock-location-new.html">Create stock location</a>
       </div>
     </section>
   </main>
@@ -53,74 +63,53 @@
   <script>
     renderCspHeader({ primary: 'Stock Levels', tab: 'Stock Locations' });
 
-    // Supplier stock locations per customer: seed + locations the supplier created in this browser.
-    // Storage locations come from the stocked items (aisle/bin/level) plus any added on the create form.
-    const NEW_KEY = 'vmi.newStockLocations';
-    const created = () => JSON.parse(localStorage.getItem(NEW_KEY) || '{}');
-    function locationsFor(customer) {
-      const items = itemsFor(customer);
-      const base = (STOCK_LOCATIONS[customer] || []).map(l => {
-        const map = new Map();
-        items.filter(i => WH_CODE[i.warehouse] === l.code).forEach(i => {
-          const key = `${i.aisle}-${i.bin}-${i.level}`;
-          const s = map.get(key) || { aisle: i.aisle, bin: i.bin, level: i.level, active: true, items: [] };
-          s.items.push(i.num); map.set(key, s);
-        });
-        return { ...l, storage: [...map.values()] };
-      });
-      return [...base, ...(created()[customer] || [])];
-    }
     const PENCIL = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M4 20l1-4.2L15.6 5.2a2 2 0 012.8 0l.4.4a2 2 0 010 2.8L8.2 19 4 20zM13.5 7.3l3.2 3.2"/></svg>';
-    const LOCK = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 018 0v3"/></svg>';
-    const CHEV = '<svg width="14" height="14" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4.5 3l3 3-3 3"/></svg>';
+    const params = new URLSearchParams(location.search);
+    const sel = document.getElementById('customer');
+    let customer = STOCK_LOCATIONS[params.get('customer')] ? params.get('customer') : 'Buyer Demo Company', q = '';
+    sel.value = customer;
+    const addr = l => [l.line1, l.line2, [[l.city || l.town, l.state].filter(Boolean).join(', '), l.zip].filter(Boolean).join(' '), l.country].filter(Boolean);
 
-    let customer = 'Buyer Demo Company', q = '';
-    const open = new Set();
     function render() {
-      const s = q.toLowerCase();
-      const rows = locationsFor(customer).filter(l => !s || [l.code, l.name, l.description, l.address, l.attention].some(v => (v || '').toLowerCase().includes(s)));
-      document.getElementById('rows').innerHTML = rows.length ? rows.map(l => {
-        const isOpen = open.has(l.code), buyer = l.createdBy === 'Buyer';
-        return `<tr>
-          <td><button class="expander ${isOpen ? 'open' : ''}" data-code="${esc(l.code)}" aria-expanded="${isOpen}">${CHEV}</button>
-            <b>${esc(l.name)}</b><span class="sub">${esc(l.code)}</span></td>
-          <td class="name">${esc(l.description)}</td>
-          <td class="name">${esc(l.address)}</td>
-          <td>${esc(l.attention)}<span class="sub">${esc(l.email)}</span></td>
-          <td>${esc(l.type)}</td>
-          <td class="num">${l.storage.length}</td>
-          <td>${buyer ? `<span class="pill">Buyer</span>` : 'Supplier'}</td>
+      const all = stockLocationsFor(customer), s = q.toLowerCase();
+      document.getElementById('table-wrap').hidden = !all.length;
+      document.querySelector('.sl-toolbar').hidden = !all.length;
+      document.getElementById('zero').hidden = !!all.length;
+      document.getElementById('zero-cust').textContent = customer;
+      document.querySelectorAll('a[href^="supplier-stock-location-new.html"]:not(.row-act)').forEach(a => { a.href = `supplier-stock-location-new.html?customer=${encodeURIComponent(customer)}`; });
+      const rows = all.filter(l => !s || [l.code, l.name, l.description, ...addr(l), l.createdBy, l.updatedBy].some(v => (v || '').toLowerCase().includes(s)));
+      document.getElementById('rows').innerHTML = rows.length ? rows.map(l => `<tr>
+          <td><a href="supplier-stock-location.html?q=${encodeURIComponent(l.name)}" title="View stock balances in ${esc(l.name)}">${esc(l.name)}</a></td>
+          <td class="sl-desc">${esc(l.description)}</td>
+          <td>${esc(l.type || 'Warehouse')}</td>
           <td>${l.active ? 'Yes' : 'No'}</td>
-          <td class="act">${buyer ? `<span class="row-act" title="Created by the buyer — read-only">${LOCK}</span>` : `<button class="row-act" data-stub aria-label="Edit ${esc(l.name)}">${PENCIL}</button>`}</td>
-        </tr>${isOpen ? `<tr class="sub-row"><td colspan="9">
-          <table class="mini"><thead><tr><th>Aisle</th><th>Bin</th><th>Level</th><th>Active</th><th>Items stored</th></tr></thead><tbody>
-          ${l.storage.length ? l.storage.map(st => `<tr><td>${esc(st.aisle)}</td><td>${esc(st.bin)}</td><td>${esc(st.level)}</td><td>${st.active ? 'Yes' : 'No'}</td>
-            <td>${st.items?.length ? `<a href="supplier-stock-location.html?q=${encodeURIComponent(l.code + '-' + st.aisle + '-' + st.bin + '-' + st.level)}">${st.items.length} item${st.items.length > 1 ? 's' : ''}</a>` : '—'}</td></tr>`).join('') : '<tr><td colspan="5">No storage locations</td></tr>'}
-          </tbody></table></td></tr>` : ''}`;
-      }).join('') : '<tr class="empty"><td colspan="9">No results found</td></tr>';
+          <td class="sl-addr">${addr(l).map(esc).join('<br>')}</td>
+          <td>${esc(l.createdBy)}</td>
+          <td>${fmtDate(l.createdOn)}</td>
+          <td>${esc(l.updatedBy || l.createdBy)}</td>
+          <td>${fmtDate(l.updatedOn || l.createdOn)}</td>
+          <td class="act"><a class="row-act" href="supplier-stock-location-new.html?edit=${encodeURIComponent(l.code)}&customer=${encodeURIComponent(customer)}" aria-label="Edit ${esc(l.name)}">${PENCIL}</a></td>
+        </tr>`).join('') : '<tr class="empty"><td colspan="10">No results found</td></tr>';
     }
-    document.getElementById('rows').addEventListener('click', e => {
-      const b = e.target.closest('.expander'); if (!b) return;
-      open.has(b.dataset.code) ? open.delete(b.dataset.code) : open.add(b.dataset.code); render();
-    });
     document.getElementById('search').addEventListener('input', e => { q = e.target.value.trim(); render(); });
-    document.getElementById('customer').addEventListener('change', e => { customer = e.target.value; render(); });
+    sel.addEventListener('change', e => { customer = e.target.value; render(); });
 
-    // ⋮ menu: create, bulk loads (stock locations / storage locations), export
+    // ⋮ menu (Figma 155:12706): Load from file → Bulk Load, exports, schedule
     document.getElementById('more-btn').addEventListener('click', e => {
+      e.stopPropagation();
       document.querySelector('.menu')?.remove();
       const m = document.createElement('div'); m.className = 'menu menu-lg'; m.setAttribute('role', 'menu');
-      m.innerHTML = ['Create stock location', 'Load stock locations from file', 'Load storage locations from file', 'Export as CSV (Current Columns)']
+      m.innerHTML = ['Load from file', 'Export as CSV Plain Text (Current Columns)', 'Schedule report']
         .map((l, i) => `<button role="menuitem" data-i="${i}"><span>${l}</span></button>`).join('');
       document.body.appendChild(m);
       const r = e.currentTarget.getBoundingClientRect();
       m.style.top = `${r.bottom + scrollY + 4}px`; m.style.left = `${r.right + scrollX - m.offsetWidth}px`;
       m.addEventListener('click', ev => {
         const i = ev.target.closest('[data-i]')?.dataset.i; m.remove();
-        if (i === '0') location.href = 'supplier-stock-location-new.html';
-        else if (i === '3') { exportCsvPlain('stock-locations', [['Stock Location', 'Code', 'Description', 'Address', 'Attention', 'Email', 'Stock Management Type', 'Storage Locations', 'Created By', 'Active'],
-          ...locationsFor(customer).map(l => [l.name, l.code, l.description, l.address, l.attention, l.email, l.type, l.storage.length, l.createdBy, l.active ? 'Yes' : 'No'])]); toast('Exported stock-locations.csv'); }
-        else toast('Bulk load of stock locations follows the Bulk Load Inventory Balance pattern — not built in this prototype');
+        if (i === '0') location.href = `supplier-bulk-load.html?from=locations&customer=${encodeURIComponent(customer)}`;
+        else if (i === '1') { exportCsvPlain('stock-locations', [['Name', 'Code', 'Description', 'Type', 'Supplier Stock Management Type', 'Active', 'Address', 'Attention', 'Attention Email', 'Storage Locations', 'Created By', 'Created Date', 'Last Updated By', 'Last Updated Date'],
+          ...stockLocationsFor(customer).map(l => [l.name, l.code, l.description, l.type, l.mgmt, l.active ? 'Yes' : 'No', addr(l).join(', '), l.attention, l.email, l.storage.length, l.createdBy, fmtDate(l.createdOn), l.updatedBy, fmtDate(l.updatedOn)])]); toast('Exported stock-locations.csv'); }
+        else toast('Schedule report is not part of this prototype');
       });
       setTimeout(() => document.addEventListener('click', function off(ev) { if (!m.contains(ev.target)) { m.remove(); document.removeEventListener('click', off); } }), 0);
     });

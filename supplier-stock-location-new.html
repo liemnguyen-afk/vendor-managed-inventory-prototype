@@ -8,54 +8,59 @@
 </head>
 <body class="csp-page">
   <main class="csp-main">
-    <a class="back-link" href="supplier-stock-locations.html">« Back to Stock Locations</a>
-    <h1>Create Stock Location</h1>
-    <p class="form-intro">Stock locations are specific to the selected customer. Buyer Demo Company will see this location and the stock you report in it (read-only).</p>
+    <h1 id="title">Create Stock Location</h1>
 
-    <form id="loc" class="cform" novalidate>
-      <section class="csp-card cform-card">
+    <!-- Figma "Create Stock Location" (207:19585) — Clarity 2 form -->
+    <form id="loc" class="c2form" novalidate>
+      <section class="c2card">
         <h2>General</h2>
-        <div class="cgrid">
-          <label class="cf"><span>Customer</span>
-            <select name="customer"><option>Buyer Demo Company</option><option>Coupa Demo Co</option></select></label>
-          <label class="cf"><span>Stock Location Name <em>*</em></span><input name="name" maxlength="80"></label>
-          <label class="cf"><span>Code</span><input name="code" maxlength="8" placeholder="e.g. SLC"></label>
-          <label class="cf wide"><span>Description</span><input name="description"></label>
-          <label class="cf"><span>Supplier Stock Management Type</span>
-            <select name="type"><option value="OWN">OWN — supplier-owned stock</option><option value="SCON">SCON — subcontracting stock</option></select></label>
-          <label class="cf check"><input type="checkbox" name="active" checked> Active</label>
+        <div class="c2grid">
+          <label class="c2f"><span>Supplier Location Name <em>*</em></span><input name="name" maxlength="80" placeholder="e.g. Laughlin Nevada"></label>
+          <label class="c2f"><span>Supplier Stock Management Type <em>*</em></span>
+            <select name="mgmt"><option value="OWN">OWN</option><option value="SCON">SCON</option></select>
+            <small>OWN: supplier-owned stock. SCON: subcontracting stock received from the buyer for assembly; its consumption is tracked for this stock location.</small></label>
+          <label class="c2f"><span>Supplier Location Description</span><textarea name="description" rows="3" placeholder="Describe this stock location"></textarea></label>
+          <fieldset class="c2f radios"><legend>Active <em>*</em></legend>
+            <label><input type="radio" name="active" value="yes" checked> Yes</label>
+            <label><input type="radio" name="active" value="no"> No</label></fieldset>
         </div>
       </section>
 
-      <section class="csp-card cform-card">
+      <section class="c2card">
         <h2>Address</h2>
-        <div class="cgrid">
-          <label class="cf wide"><span>Address Line 1 <em>*</em></span><input name="line1"></label>
-          <label class="cf wide"><span>Address Line 2</span><input name="line2"></label>
-          <label class="cf"><span>City</span><input name="city"></label>
-          <label class="cf"><span>Town</span><input name="town"></label>
-          <label class="cf"><span>State</span><input name="state"></label>
-          <label class="cf"><span>Subdivision ISO Code</span><input name="iso" placeholder="e.g. US-UT"></label>
-          <label class="cf"><span>Postal Code</span><input name="zip"></label>
-          <label class="cf"><span>Attention (vendor contact)</span><input name="attention"></label>
-          <label class="cf"><span>Attention Email</span><input name="email" type="email" placeholder="Used for email notifications"></label>
-          <label class="cf"><span>Tax Registration</span><input name="tax"></label>
+        <div class="c2grid">
+          <label class="c2f"><span>Address Line 1 <em>*</em></span><input name="line1" placeholder="Street address or P.O. box"></label>
+          <label class="c2f"><span>Address Line 2</span><input name="line2" placeholder="Unit, building or floor"></label>
+          <label class="c2f"><span>City</span><input name="city" placeholder="City"></label>
+          <label class="c2f"><span>Town</span><input name="town" placeholder="Town"></label>
+          <label class="c2f"><span>State</span><select name="state"><option value="">Select state</option></select></label>
+          <label class="c2f"><span>Subdivision ISO Code</span><input name="iso" placeholder="e.g. US-NV"></label>
+          <label class="c2f"><span>Postal Code</span><input name="zip" placeholder="e.g. 89029"></label>
         </div>
       </section>
 
-      <section class="csp-card cform-card">
-        <h2>Storage Locations <em>*</em></h2>
-        <p class="hint-sm">At least one storage location is required.</p>
-        <table class="items mini-edit">
-          <thead><tr><th>Aisle</th><th>Bin</th><th>Level</th><th>Active</th><th></th></tr></thead>
+      <section class="c2card">
+        <h2>Attention</h2>
+        <p class="c2sub">Responsible vendor contact for this stock location.</p>
+        <div class="c2grid">
+          <label class="c2f"><span>Attention</span><input name="attention" placeholder="Vendor contact name"></label>
+          <label class="c2f"><span>Attention Email</span><input name="email" type="email" placeholder="name@company.com"><small>Used for email notifications about this stock location.</small></label>
+        </div>
+      </section>
+
+      <section class="c2card">
+        <h2>Storage Locations</h2>
+        <p class="c2sub">At least one storage location is required. Add a row for each aisle / bin / location in this stock location.</p>
+        <table class="c2table">
+          <thead><tr><th>Aisle</th><th>Bin</th><th>Location</th><th class="c">Active</th><th class="c">Actions</th></tr></thead>
           <tbody id="storage"></tbody>
         </table>
         <button type="button" class="btn-outline-sm" id="add-row">+ Add storage location</button>
       </section>
 
-      <div class="cform-actions">
-        <a href="supplier-stock-locations.html" class="btn-text-sm">Cancel</a>
-        <button type="submit" class="btn-primary-sm">Create</button>
+      <div class="c2actions">
+        <a href="supplier-stock-locations.html" class="btn-text-sm" id="cancel">Cancel</a>
+        <button type="submit" class="btn-primary-sm" id="submit">Create</button>
       </div>
     </form>
   </main>
@@ -64,39 +69,70 @@
   <script src="js/supplier-data.js"></script>
   <script>
     renderCspHeader({ primary: 'Stock Levels', tab: 'Stock Locations' });
+    const params = new URLSearchParams(location.search);
+    const customer = STOCK_LOCATIONS[params.get('customer')] ? params.get('customer') : 'Buyer Demo Company';
+    const editing = params.get('edit') ? stockLocationsFor(customer).find(l => l.code === params.get('edit')) : null;
     const form = document.getElementById('loc'), body = document.getElementById('storage');
-    const row = () => body.insertAdjacentHTML('beforeend', `<tr>
-        <td><input class="inl-qty" data-f="aisle" aria-label="Aisle"></td><td><input class="inl-qty" data-f="bin" aria-label="Bin"></td>
-        <td><input class="inl-qty" data-f="level" aria-label="Level"></td><td><input type="checkbox" data-f="active" checked aria-label="Active"></td>
-        <td><button type="button" class="row-act" data-del aria-label="Remove row">✕</button></td></tr>`);
-    row();
+    const STATES = { AZ: 'Arizona', CA: 'California', NV: 'Nevada', UT: 'Utah' };
+    form.state.insertAdjacentHTML('beforeend', Object.entries(STATES).map(([k, v]) => `<option value="${k}">${v}</option>`).join(''));
+    form.state.addEventListener('change', () => { if (form.state.value && !form.iso.value) form.iso.value = `US-${form.state.value}`; });
+
+    const TRASH = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13M10 11v6M14 11v6"/></svg>';
+    const row = (s = { aisle: '', bin: '', level: '', active: true }) => body.insertAdjacentHTML('beforeend', `<tr>
+        <td><input data-f="aisle" value="${esc(s.aisle)}" aria-label="Aisle"></td><td><input data-f="bin" value="${esc(s.bin)}" aria-label="Bin"></td>
+        <td><input data-f="level" value="${esc(s.level)}" aria-label="Location"></td>
+        <td class="c"><input type="checkbox" data-f="active" ${s.active ? 'checked' : ''} aria-label="Active"></td>
+        <td class="c"><button type="button" class="row-act" data-del aria-label="Remove storage location">${TRASH}</button></td></tr>`);
+
+    if (editing) {
+      document.title = document.title.replace('Create', 'Edit');
+      document.getElementById('title').textContent = `Edit Stock Location — ${editing.name}`;
+      document.getElementById('submit').textContent = 'Save';
+      for (const k of ['name', 'mgmt', 'description', 'line1', 'line2', 'city', 'town', 'state', 'iso', 'zip', 'attention', 'email']) if (form[k]) form[k].value = editing[k] || '';
+      form.active.value = editing.active ? 'yes' : 'no';
+      editing.storage.forEach(row);
+    } else row();
+
     document.getElementById('add-row').addEventListener('click', () => { row(); body.lastElementChild.querySelector('input').focus(); });
-    body.addEventListener('click', e => { if (e.target.closest('[data-del]') && body.children.length > 1) e.target.closest('tr').remove(); });
+    body.addEventListener('click', e => {
+      if (!e.target.closest('[data-del]')) return;
+      if (body.children.length === 1) return toast('At least one storage location is required');
+      e.target.closest('tr').remove();
+    });
 
     form.addEventListener('submit', e => {
       e.preventDefault();
       form.querySelectorAll('.field-error').forEach(el => el.classList.remove('field-error'));
-      const v = Object.fromEntries(new FormData(form)); v.active = form.active.checked;
+      const v = Object.fromEntries(new FormData(form));
       const storage = [...body.querySelectorAll('tr')].map(tr => ({
         aisle: tr.querySelector('[data-f=aisle]').value.trim(), bin: tr.querySelector('[data-f=bin]').value.trim(),
         level: tr.querySelector('[data-f=level]').value.trim(), active: tr.querySelector('[data-f=active]').checked })).filter(s => s.aisle || s.bin || s.level);
+      const name = v.name.trim();
+      const dup = name && stockLocationsFor(customer).some(l => l.code !== editing?.code && l.name.toLowerCase() === name.toLowerCase());
       const bad = [];
-      if (!v.name.trim()) bad.push(form.name);
+      if (!name || dup) bad.push(form.name);
       if (!v.line1.trim()) bad.push(form.line1);
       if (!storage.length) bad.push(body.querySelector('input'));
-      const all = JSON.parse(localStorage.getItem('vmi.newStockLocations') || '{}');
-      const existing = [...(STOCK_LOCATIONS[v.customer] || []), ...(all[v.customer] || [])];
-      if (v.name.trim() && existing.some(l => l.name.toLowerCase() === v.name.trim().toLowerCase())) bad.push(form.name);
-      if (bad.length) { bad.forEach(el => el.classList.add('field-error')); bad[0].focus(); toast(existing.some(l => l.name.toLowerCase() === v.name.trim().toLowerCase()) ? 'A stock location with this name already exists for this customer.' : 'Fill in the required fields (*).'); return; }
-      const code = (v.code.trim() || v.name.trim().replace(/[^A-Za-z]/g, '').slice(0, 3)).toUpperCase();
-      const now = new Date(), p = n => String(n).padStart(2, '0');
-      (all[v.customer] = all[v.customer] || []).push({ code, name: v.name.trim(), description: v.description.trim(),
-        address: [v.line1, v.line2, v.city, v.town, v.state, v.zip].map(s => s.trim()).filter(Boolean).join(', '),
-        attention: v.attention.trim(), email: v.email.trim(), tax: v.tax.trim(), type: v.type, active: v.active, createdBy: 'Supplier',
-        createdOn: `${now.getFullYear()}-${p(now.getMonth() + 1)}-${p(now.getDate())}T${p(now.getHours())}:${p(now.getMinutes())}`, storage });
-      localStorage.setItem('vmi.newStockLocations', JSON.stringify(all));
-      sessionStorage.setItem('vmi.locFlash', `Stock location ${v.name.trim()} created for ${v.customer}`);
-      location.href = 'supplier-stock-locations.html';
+      if (bad.length) {
+        bad.forEach(el => el.classList.add('field-error')); bad[0].focus();
+        return toast(dup ? 'A stock location with this name already exists for this customer.' : !storage.length && bad.length === 1 ? 'At least one storage location is required.' : 'Fill in the required fields (*).');
+      }
+      const d = new Date(), today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const fields = { name, mgmt: v.mgmt, description: v.description.trim(), active: v.active === 'yes', line1: v.line1.trim(), line2: v.line2.trim(), city: v.city.trim(), town: v.town.trim(),
+        state: v.state, iso: v.iso.trim(), zip: v.zip.trim(), country: 'United States', attention: v.attention.trim(), email: v.email.trim(), storage, updatedBy: CURRENT_USER, updatedOn: today };
+      if (editing) {
+        const all = JSON.parse(localStorage.getItem(EDIT_LOC_KEY) || '{}');
+        (all[customer] = all[customer] || {})[editing.code] = fields;
+        localStorage.setItem(EDIT_LOC_KEY, JSON.stringify(all));
+        sessionStorage.setItem('vmi.locFlash', `Stock location ${name} updated`);
+      } else {
+        const all = JSON.parse(localStorage.getItem(NEW_LOC_KEY) || '{}');
+        const code = name.replace(/[^A-Za-z]/g, '').slice(0, 3).toUpperCase() + Date.now().toString().slice(-3);
+        (all[customer] = all[customer] || []).push({ code, type: 'Warehouse', createdBy: CURRENT_USER, createdOn: today, ...fields });
+        localStorage.setItem(NEW_LOC_KEY, JSON.stringify(all));
+        sessionStorage.setItem('vmi.locFlash', `Stock location ${name} created for ${customer}`);
+      }
+      location.href = `supplier-stock-locations.html?customer=${encodeURIComponent(customer)}`;
     });
   </script>
 </body>

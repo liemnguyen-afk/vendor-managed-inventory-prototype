@@ -48,9 +48,11 @@
   <script src="js/supplier-data.js"></script>
   <script>
     const params = new URLSearchParams(location.search);
-    renderCspHeader(params.get('from') === 'items' ? { primary: 'Items', tab: 'Items' } : { primary: 'Stock Levels', tab: 'Stock Balances' });
+    const FROM = { items: [{ primary: 'Items', tab: 'Items' }, ['Items', 'supplier-items.html']], locations: [{ primary: 'Stock Levels', tab: 'Stock Locations' }, ['Stock Locations', 'supplier-stock-locations.html']] }[params.get('from')]
+      || [{ primary: 'Stock Levels', tab: 'Stock Balances' }, ['Stock Balances', 'supplier-stock-location.html']];
+    renderCspHeader(FROM[0]);
     const customer = SEED[params.get('customer')] ? params.get('customer') : 'Buyer Demo Company';
-    const from = params.get('from') === 'items' ? ['Items', 'supplier-items.html'] : ['Stock Balances', 'supplier-stock-location.html'];
+    const from = FROM[1];
     const back = document.getElementById('back');
     back.textContent = `« Back to ${from[0]}`; back.href = from[1];
 
