@@ -55,7 +55,15 @@ const UPLOAD_FREQUENCY = { 'Buyer Demo Company': 'Weekly', 'Coupa Demo Co': 'Wee
 const FREQ_DAYS = { Daily: 1, Weekly: 7, Monthly: 30 };
 const UPLOAD_KEY = 'vmi.lastUpload';
 const SEED_UPLOAD = { 'Buyer Demo Company': { on: '2026-10-26T09:14', by: 'Ines Ellis', file: 'stock-upload-2026-10-26.csv', rows: 12 } };
-function lastUpload(customer) { return (JSON.parse(localStorage.getItem(UPLOAD_KEY) || '{}')[customer]) || SEED_UPLOAD[customer] || null; }
+// ?upload=recent → "up to date" scenario (Figma 293:7685): an upload today at 09:14, so the banner shows the info state
+const UPLOAD_SCENARIO = new URLSearchParams(location.search).get('upload');
+function lastUpload(customer) {
+  if (UPLOAD_SCENARIO === 'recent' && SEED[customer]?.length) {
+    const d = new Date(), day = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    return { on: `${day}T09:14`, by: 'Ines Ellis', file: `stock-upload-${day}.csv`, rows: SEED[customer].length };
+  }
+  return (JSON.parse(localStorage.getItem(UPLOAD_KEY) || '{}')[customer]) || SEED_UPLOAD[customer] || null;
+}
 function recordUpload(customer, file, rows) {
   const all = JSON.parse(localStorage.getItem(UPLOAD_KEY) || '{}');
   const now = new Date(), p = n => String(n).padStart(2, '0');

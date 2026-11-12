@@ -25,12 +25,14 @@ const PROTO_SCREENS = [   // mirrors the Figma flow on page "Vendor Managed Inve
     ['supplier-stock-locations.html?customer=Coupa%20Demo%20Co', 'Stock Locations — zero state'],
     ['supplier-stock-location-new.html?customer=Buyer%20Demo%20Company', 'Create Stock Location'],
     ['supplier-stock-location.html?customer=Buyer%20Demo%20Company', 'Stock Balances (populated · inline edit)'],
+    ['supplier-stock-location.html?customer=Buyer%20Demo%20Company&upload=recent', 'Stock Balances — upload up to date (info banner)'],
     ['supplier-stock-location.html?customer=Coupa%20Demo%20Co', 'Stock Balances — zero state'],
     ['supplier-bulk-load.html?from=stock-location&customer=Buyer%20Demo%20Company', 'Bulk Load Inventory Balance'],
   ]],
   ['3 · Enterprise – On-Hand Balances (Buyer Demo Company)', [
     ['ohb.html', 'On-Hand Balances'],
     ['ohb-vendor-stock.html', 'Vendor Stock Balances'],
+    ['ohb-vendor-stock.html?upload=recent', 'Vendor Stock Balances — upload up to date (info banner)'],
   ]],
   ['Other screens (not in the Figma flow)', [
     ['supplier-vmi.html', 'Supplier profile (earlier concept)'],
@@ -57,7 +59,8 @@ function renderProtoNav() {
   const other = PROTO_COUNTERPART[here];
   // same page listed twice (populated / zero state): match on ?customer= too
   const curCust = new URLSearchParams(location.search).get('customer') || sessionStorage.getItem('vmi.cspCustomer');
-  const isHere = href => { const [f, q] = href.split('?'); if (f !== here) return false; const c = new URLSearchParams(q || '').get('customer'); return !c || !curCust || c === curCust; };
+  const curUp = new URLSearchParams(location.search).get('upload') || '';
+  const isHere = href => { const [f, q] = href.split('?'); if (f !== here) return false; const p = new URLSearchParams(q || ''), c = p.get('customer'); return (!c || !curCust || c === curCust) && (p.get('upload') || '') === curUp; };
   document.body.insertAdjacentHTML('beforeend', `
   <div class="proto-nav">
     <div class="panel" id="proto-panel" role="dialog" aria-label="Prototype navigator">
