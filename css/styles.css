@@ -743,3 +743,8 @@ textarea.se-in { padding: 6px; resize: none; }
   font: 20px/1 var(--cui-font-family-control); color: inherit; }
 .cui-alert.is-positive .cui-alert-close { color: var(--cui-color-text-subtle-green); }
 .cui-alert-close:hover { background: var(--cui-color-neutralMinimal-surface-hover); }
+/* Address section in two columns (Figma 207:19585) */
+.c2col.two { display: grid; grid-template-columns: 1fr 1fr; gap: var(--cui-space-3xl) var(--cui-space-4xl); align-items: start; }
+.c2col.two .span2 { grid-column: 1 / -1; }
+.c2col.two > [hidden] { display: none; }
+.c2col.two .c2link.start { justify-self: start; }
