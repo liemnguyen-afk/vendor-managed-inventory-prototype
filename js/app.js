@@ -25,6 +25,7 @@ const PROTO_SCREENS = [   // mirrors the Figma flow on page "Vendor Managed Inve
     ['supplier-stock-locations.html?customer=Coupa%20Demo%20Co', 'Stock Locations — zero state'],
     ['supplier-stock-location-new.html', 'Create Stock Location'],
     ['supplier-stock-location.html', 'Stock Balances (inline edit)'],
+    ['supplier-stock-location.html?customer=Coupa%20Demo%20Co', 'Stock Balances — zero state'],
     ['supplier-bulk-load.html?from=stock-location', 'Bulk Load Inventory Balance'],
   ]],
   ['3 · Enterprise – On-Hand Balances (Buyer Demo Company)', [

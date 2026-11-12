@@ -11,6 +11,9 @@ const TABS = {
 const PAGE = window.ITEMS_PAGE || { tab: 'Items' };
 const CFG = TABS[PAGE.tab];
 const IS_CSP = CFG.shell === 'csp';
+// ?customer= preselects the customer (e.g. Coupa Demo Co → Stock Balances zero state, Figma 287:6471)
+const Q_CUST = new URLSearchParams(location.search).get('customer');
+if (IS_CSP && Q_CUST && SEED[Q_CUST] && document.getElementById('customer')) document.getElementById('customer').value = Q_CUST;
 const IS_STOCK = CFG.cols === 'stock' || CFG.cols === 'vendor';   // supplier-maintained stock view
 const EDITABLE = CFG.actions === 'edit';                          // only the supplier edits inline
 
@@ -124,7 +127,7 @@ document.getElementById('head').innerHTML = COLS.map(k =>
   `<th data-sort="${k}" class="${C[k].num ? 'num' : ''}">${C[k].label}</th>`).join('') + (SHOW_ACTIONS ? `<th class="${EDITABLE ? 'act' : ''}">Actions</th>` : '');
 
 /* ---------------------------------------------------------------- Render */
-const state = { customer: 'Buyer Demo Company', view: 'All', q: '', warehouses: new Set(), sort: 'num', dir: 1, userSorted: false, editing: null, editErrs: null, editVals: null };
+const state = { customer: (IS_CSP && document.getElementById('customer')?.value) || 'Buyer Demo Company', view: 'All', q: '', warehouses: new Set(), sort: 'num', dir: 1, userSorted: false, editing: null, editErrs: null, editVals: null };
 
 function visible() {
   const q = state.q.toLowerCase();
@@ -185,6 +188,7 @@ function renderZero() {
   card.querySelector('.toolbar').hidden = empty;
   card.querySelector('.table-scroll').hidden = empty;
   card.querySelector('.sl-zero')?.remove();
+  const strip = document.querySelector('.upload-strip'); if (strip) strip.hidden = empty;
   if (!empty) return;
   const q = `customer=${encodeURIComponent(state.customer)}`;
   card.insertAdjacentHTML('beforeend', `<div class="sl-zero">

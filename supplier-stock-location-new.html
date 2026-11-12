@@ -141,13 +141,13 @@
         const all = JSON.parse(localStorage.getItem(EDIT_LOC_KEY) || '{}');
         (all[customer] = all[customer] || {})[editing.code] = fields;
         localStorage.setItem(EDIT_LOC_KEY, JSON.stringify(all));
-        sessionStorage.setItem('vmi.locFlash', `Stock location ${name} updated`);
+        sessionStorage.setItem('vmi.locFlash', JSON.stringify({ kind: 'updated', name, customer, storage: storage.length }));
       } else {
         const all = JSON.parse(localStorage.getItem(NEW_LOC_KEY) || '{}');
         const code = name.replace(/[^A-Za-z]/g, '').slice(0, 3).toUpperCase() + Date.now().toString().slice(-3);
         (all[customer] = all[customer] || []).push({ code, type: 'Warehouse', createdBy: CURRENT_USER, createdOn: today, ...fields });
         localStorage.setItem(NEW_LOC_KEY, JSON.stringify(all));
-        sessionStorage.setItem('vmi.locFlash', `Stock location ${name} created for ${customer}`);
+        sessionStorage.setItem('vmi.locFlash', JSON.stringify({ kind: 'created', name, customer, storage: storage.length }));
       }
       location.href = `supplier-stock-locations.html?customer=${encodeURIComponent(customer)}`;
     });

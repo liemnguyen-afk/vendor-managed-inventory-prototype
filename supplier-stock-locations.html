@@ -114,7 +114,23 @@
       setTimeout(() => document.addEventListener('click', function off(ev) { if (!m.contains(ev.target)) { m.remove(); document.removeEventListener('click', off); } }), 0);
     });
 
-    if (sessionStorage.getItem('vmi.locFlash')) { toast(sessionStorage.getItem('vmi.locFlash')); sessionStorage.removeItem('vmi.locFlash'); }
+    // Success alert after Create / Save (Clarity Alert · Standard · Positive, closable — Figma 308:10115)
+    const flashRaw = sessionStorage.getItem('vmi.locFlash');
+    if (flashRaw) {
+      sessionStorage.removeItem('vmi.locFlash');
+      let f; try { f = JSON.parse(flashRaw); } catch { f = null; }
+      if (f) {
+        const n = `${f.storage} storage location${f.storage === 1 ? '' : 's'}`;
+        document.querySelector('.csp-card').insertAdjacentHTML('beforebegin', `
+          <div class="cui-alert is-positive" role="status" id="loc-success">
+            <span class="cui-alert-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16 9.6"/></svg></span>
+            <div class="cui-alert-body"><p class="cui-alert-title">Stock location ${f.kind === 'updated' ? 'updated' : 'created'}</p>
+              <p class="cui-alert-desc">${esc(f.name)} was ${f.kind === 'updated' ? 'updated' : 'added'} for ${esc(f.customer)} with ${n}.</p></div>
+            <button type="button" class="cui-alert-close" aria-label="Dismiss">×</button>
+          </div>`);
+        document.querySelector('#loc-success .cui-alert-close').addEventListener('click', e => e.currentTarget.closest('.cui-alert').remove());
+      }
+    }
     render();
   </script>
 </body>
