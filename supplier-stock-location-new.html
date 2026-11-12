@@ -43,7 +43,7 @@
           <button type="button" class="c2link start span2" id="add-line3">+ Address Line 3</button>
           <label class="c2f"><span>City/Town <em>*</em></span><input name="city" placeholder="City or town"></label>
           <label class="c2f"><span>State/Province/Prefecture <em>*</em></span><select name="state"><option value="">Select</option></select></label>
-          <div class="c2f ro"><span>Subdivision ISO Code</span><output name="iso"></output></div>
+          <label class="c2f"><span>Subdivision ISO Code</span><input name="iso" placeholder="e.g. US-NV"></label>
           <label class="c2f"><span>Postal Code <em>*</em></span><input name="zip" placeholder="e.g. 89029"></label>
         </div>
       </section>
@@ -84,8 +84,8 @@
     const form = document.getElementById('loc'), body = document.getElementById('storage');
     const STATES = { AZ: 'Arizona', CA: 'California', NV: 'Nevada', UT: 'Utah' };
     form.state.insertAdjacentHTML('beforeend', Object.entries(STATES).map(([k, v]) => `<option value="${k}">${v}</option>`).join(''));
-    // Subdivision ISO Code is read-only and derived from the state
-    const syncIso = () => { form.iso.value = form.state.value ? `US-${form.state.value}` : ''; };
+    // Subdivision ISO Code is filled from the state (still editable)
+    const syncIso = () => { if (form.state.value) form.iso.value = `US-${form.state.value}`; };
     form.state.addEventListener('change', syncIso);
     const showLine3 = () => { document.getElementById('line3-field').hidden = false; document.getElementById('add-line3').hidden = true; };
     document.getElementById('add-line3').addEventListener('click', () => { showLine3(); form.line3.focus(); });
@@ -107,7 +107,7 @@
       document.getElementById('title').textContent = `Edit Stock Location — ${editing.name}`;
       document.getElementById('submit').textContent = 'Save';
       for (const k of ['name', 'mgmt', 'description', 'addrName', 'line1', 'line2', 'line3', 'state', 'zip', 'attention', 'email']) if (form[k]) form[k].value = editing[k] || '';
-      form.city.value = editing.city || editing.town || ''; syncIso(); if (editing.line3) showLine3();
+      form.city.value = editing.city || editing.town || ''; form.iso.value = editing.iso || (editing.state ? `US-${editing.state}` : ''); if (editing.line3) showLine3();
       form.active.value = editing.active ? 'yes' : 'no';
       editing.storage.forEach(row);
     } else row();
@@ -139,7 +139,7 @@
       }
       const d = new Date(), today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
       const fields = { name, mgmt: v.mgmt, description: v.description.trim(), active: v.active === 'yes', addrName: v.addrName.trim(), line1: v.line1.trim(), line2: v.line2.trim(), line3: (v.line3 || '').trim(), city: v.city.trim(), town: '',
-        state: v.state, iso: form.iso.value, zip: v.zip.trim(), country: 'United States', attention: v.attention.trim(), email: v.email.trim(), storage, updatedBy: CURRENT_USER, updatedOn: today };
+        state: v.state, iso: v.iso.trim(), zip: v.zip.trim(), country: 'United States', attention: v.attention.trim(), email: v.email.trim(), storage, updatedBy: CURRENT_USER, updatedOn: today };
       if (editing) {
         const all = JSON.parse(localStorage.getItem(EDIT_LOC_KEY) || '{}');
         (all[customer] = all[customer] || {})[editing.code] = fields;
