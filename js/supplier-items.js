@@ -28,20 +28,31 @@ if (!IS_CSP) document.querySelector('.csp-main h1').insertAdjacentHTML('afterend
   </nav>`);
 
 // Last upload + next update due (supplier profile frequency) — Stock Balances and Vendor Stock Balances
+// Upload status as a Clarity 2 alert (CuiAlert anatomy: severity icon · title · description · endSlot action)
+const ALERT_ICON = {
+  info: '<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor"/><path d="M12 11v5.5M12 7.5v.2" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>',
+  warning: '<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 3.6a2 2 0 013.4 0l8.3 14.3A2 2 0 0120.3 21H3.7A2 2 0 012 17.9z" fill="currentColor"/><path d="M12 9v5M12 17.2v.2" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>',
+};
 function renderUploadStrip() {
   if (!IS_STOCK) return;
   document.querySelector('.upload-strip')?.remove();
   const cust = IS_CSP ? (document.getElementById('customer')?.value || 'Buyer Demo Company') : 'Buyer Demo Company';
   const u = lastUpload(cust), due = nextUploadDue(cust), freq = UPLOAD_FREQUENCY[cust] || 'Weekly';
-  const today = new Date().toISOString().slice(0, 10), overdue = due && due < today;
-  const html = u
-    ? `<div class="upload-strip ${overdue ? 'overdue' : ''}" role="status">
-        <span><b>Last file upload:</b> ${fmtDateTime(u.on)} by ${esc(u.by)} · ${esc(u.file)} (${u.rows} rows)</span>
-        <span><b>Next update required on:</b> ${fmtDate(due)} <i>(${freq})</i>${overdue ? ' — <b>overdue</b>' : ''}</span>
-      </div>`
-    : `<div class="upload-strip overdue" role="status"><span><b>No stock file uploaded yet.</b> ${IS_CSP ? 'Use ⋮ → Load from file to share your stock levels.' : 'The supplier hasn\'t shared stock levels yet.'}</span><span><b>Update frequency:</b> ${freq}</span></div>`;
-  const before = document.querySelector('.csp-card');
-  before.insertAdjacentHTML('beforebegin', html);
+  const d = new Date(), today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const overdue = due && due < today;
+  const lastLine = u ? `Last file upload: ${fmtDateTime(u.on)} by ${esc(u.by)} · ${esc(u.file)} (${u.rows} rows).` : '';
+  const [severity, title, description] = !u
+    ? ['warning', 'No stock file uploaded yet', `${IS_CSP ? `Share your stock levels with ${esc(cust)}.` : `${esc(SUPPLIER_NAME)} hasn't shared stock levels yet.`} Update frequency: ${freq}.`]
+    : overdue
+      ? ['warning', `Stock update overdue — was required on ${fmtDate(due)} (${freq})`, lastLine]
+      : ['info', `Next stock update required on ${fmtDate(due)} (${freq})`, lastLine];
+  const action = IS_CSP ? `<a class="cui-alert-action" href="supplier-bulk-load.html?from=stock-location&customer=${encodeURIComponent(cust)}">Load from file</a>` : '';
+  document.querySelector('.csp-card').insertAdjacentHTML('beforebegin', `
+    <div class="cui-alert ${severity} upload-strip" role="${severity === 'warning' ? 'alert' : 'status'}">
+      <span class="cui-alert-icon">${ALERT_ICON[severity]}</span>
+      <div class="cui-alert-body"><p class="cui-alert-title">${title}</p>${description ? `<p class="cui-alert-desc">${description}</p>` : ''}</div>
+      ${action}
+    </div>`);
 }
 renderUploadStrip();
 
