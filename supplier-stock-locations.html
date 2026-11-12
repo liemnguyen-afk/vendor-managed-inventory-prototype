@@ -107,8 +107,8 @@
       m.addEventListener('click', ev => {
         const i = ev.target.closest('[data-i]')?.dataset.i; m.remove();
         if (i === '0') location.href = `supplier-bulk-load.html?from=locations&customer=${encodeURIComponent(customer)}`;
-        else if (i === '1') { exportCsvPlain('stock-locations', [['Name', 'Code', 'Description', 'Type', 'Supplier Stock Management Type', 'Active', 'Address', 'Attention', 'Attention Email', 'Storage Locations', 'Created By', 'Created Date', 'Last Updated By', 'Last Updated Date'],
-          ...stockLocationsFor(customer).map(l => [l.name, l.code, l.description, l.type, l.mgmt, l.active ? 'Yes' : 'No', addr(l).join(', '), l.attention, l.email, l.storage.length, l.createdBy, fmtDate(l.createdOn), l.updatedBy, fmtDate(l.updatedOn)])]); toast('Exported stock-locations.csv'); }
+        else if (i === '1') { exportCsvPlain('stock-locations', [['Name', 'Code', 'Description', 'Type', 'Active', 'Address', 'Attention', 'Attention Email', 'Storage Locations', 'Created By', 'Created Date', 'Last Updated By', 'Last Updated Date'],
+          ...stockLocationsFor(customer).map(l => [l.name, l.code, l.description, l.type, l.active ? 'Yes' : 'No', addr(l).join(', '), l.attention, l.email, l.storage.length, l.createdBy, fmtDate(l.createdOn), l.updatedBy, fmtDate(l.updatedOn)])]); toast('Exported stock-locations.csv'); }
         else toast('Schedule report is not part of this prototype');
       });
       setTimeout(() => document.addEventListener('click', function off(ev) { if (!m.contains(ev.target)) { m.remove(); document.removeEventListener('click', off); } }), 0);

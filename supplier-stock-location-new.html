@@ -135,7 +135,7 @@
         return toast(dup ? 'A stock location with this name already exists for this customer.' : !storage.length && bad.length === 1 ? 'At least one storage location is required.' : 'Fill in the required fields (*).');
       }
       const d = new Date(), today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      const fields = { name, mgmt: editing?.mgmt || 'OWN', description: v.description.trim(), active: v.active === 'yes', addrName: v.addrName.trim(), line1: v.line1.trim(), line2: v.line2.trim(), line3: (v.line3 || '').trim(), city: v.city.trim(), town: '',
+      const fields = { name, description: v.description.trim(), active: v.active === 'yes', addrName: v.addrName.trim(), line1: v.line1.trim(), line2: v.line2.trim(), line3: (v.line3 || '').trim(), city: v.city.trim(), town: '',
         state: v.state, iso: v.iso.trim(), zip: v.zip.trim(), country: 'United States', attention: v.attention.trim(), email: v.email.trim(), storage, updatedBy: CURRENT_USER, updatedOn: today };
       if (editing) {
         const all = JSON.parse(localStorage.getItem(EDIT_LOC_KEY) || '{}');
