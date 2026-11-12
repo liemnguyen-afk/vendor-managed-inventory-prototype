@@ -12,8 +12,8 @@ const PAGE = window.ITEMS_PAGE || { tab: 'Items' };
 const CFG = TABS[PAGE.tab];
 const IS_CSP = CFG.shell === 'csp';
 // ?customer= preselects the customer (e.g. Coupa Demo Co → Stock Balances zero state, Figma 287:6471)
-const Q_CUST = new URLSearchParams(location.search).get('customer');
-if (IS_CSP && Q_CUST && SEED[Q_CUST] && document.getElementById('customer')) document.getElementById('customer').value = Q_CUST;
+const Q_CUST = new URLSearchParams(location.search).get('customer') || sessionStorage.getItem('vmi.cspCustomer');
+if (IS_CSP && Q_CUST && SEED[Q_CUST] && document.getElementById('customer')) { document.getElementById('customer').value = Q_CUST; sessionStorage.setItem('vmi.cspCustomer', Q_CUST); }
 const IS_STOCK = CFG.cols === 'stock' || CFG.cols === 'vendor';   // supplier-maintained stock view
 const EDITABLE = CFG.actions === 'edit';                          // only the supplier edits inline
 
@@ -356,6 +356,7 @@ document.querySelector('.items thead').addEventListener('click', e => {
 document.getElementById('search').addEventListener('input', e => { state.q = e.target.value.trim(); render(); });
 document.getElementById('customer')?.addEventListener('change', e => {
   state.customer = e.target.value;
+  sessionStorage.setItem('vmi.cspCustomer', state.customer);
   renderUploadStrip();
   state.warehouses.clear();
   closeMenu(); render();

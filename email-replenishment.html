@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <title>Replenishment notification email · Vendor Managed Inventory prototype</title>
-  <link rel="stylesheet" href="css/clarity-tokens.css">
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/clarity-tokens.css?v=202611121429">
+  <link rel="stylesheet" href="css/styles.css?v=202611121429">
 </head>
 <body class="csp-page ent-page">
   <main class="csp-main ent">
@@ -28,8 +28,8 @@
       </div>
     </article>
   </main>
-  <script src="js/app.js"></script>
-  <script src="js/supplier-data.js"></script>
+  <script src="js/app.js?v=202611121429"></script>
+  <script src="js/supplier-data.js?v=202611121429"></script>
   <script>
     renderHeader({ primary: 'Inventory', sub: 'Replenishment' }); renderFooter();
     const run = replenishmentRun(), all = run.flatMap(l => l.reqs), withSup = all.filter(r => r.supplier).length;

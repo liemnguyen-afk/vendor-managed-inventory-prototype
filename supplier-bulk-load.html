@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <title>Bulk Load Inventory Balance · Coupa Supplier Portal · Vendor Managed Inventory prototype</title>
-  <link rel="stylesheet" href="css/clarity-tokens.css">
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/clarity-tokens.css?v=202611121429">
+  <link rel="stylesheet" href="css/styles.css?v=202611121429">
 </head>
 <body class="csp-page">
   <main class="classic bulk">
@@ -44,8 +44,8 @@
     <div class="form-actions"><button type="button" class="btn-save" id="start">Start Upload</button></div>
   </main>
 
-  <script src="js/app.js"></script>
-  <script src="js/supplier-data.js"></script>
+  <script src="js/app.js?v=202611121429"></script>
+  <script src="js/supplier-data.js?v=202611121429"></script>
   <script>
     const params = new URLSearchParams(location.search);
     const FROM = { items: [{ primary: 'Items', tab: 'Items' }, ['Items', 'supplier-items.html']], locations: [{ primary: 'Stock Levels', tab: 'Stock Locations' }, ['Stock Locations', 'supplier-stock-locations.html']] }[params.get('from')]
