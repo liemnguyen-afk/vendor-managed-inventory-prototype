@@ -20,9 +20,6 @@
             <label><input type="radio" name="active" value="yes" checked> Yes</label>
             <label><input type="radio" name="active" value="no"> No</label></fieldset>
           <label class="c2f"><span>Supplier Location Description</span><textarea name="description" rows="3" placeholder="Describe this stock location"></textarea></label>
-          <label class="c2f"><span>Supplier Stock Management Type <em>*</em></span>
-            <select name="mgmt"><option value="OWN">OWN</option><option value="SCON">SCON</option></select>
-            <small>OWN: supplier-owned stock. SCON: subcontracting stock received from the buyer for assembly; its consumption is tracked for this stock location.</small></label>
         </div>
       </section>
 
@@ -106,7 +103,7 @@
       document.title = document.title.replace('Create', 'Edit');
       document.getElementById('title').textContent = `Edit Stock Location — ${editing.name}`;
       document.getElementById('submit').textContent = 'Save';
-      for (const k of ['name', 'mgmt', 'description', 'addrName', 'line1', 'line2', 'line3', 'state', 'zip', 'attention', 'email']) if (form[k]) form[k].value = editing[k] || '';
+      for (const k of ['name', 'description', 'addrName', 'line1', 'line2', 'line3', 'state', 'zip', 'attention', 'email']) if (form[k]) form[k].value = editing[k] || '';
       form.city.value = editing.city || editing.town || ''; form.iso.value = editing.iso || (editing.state ? `US-${editing.state}` : ''); if (editing.line3) showLine3();
       form.active.value = editing.active ? 'yes' : 'no';
       editing.storage.forEach(row);
@@ -138,7 +135,7 @@
         return toast(dup ? 'A stock location with this name already exists for this customer.' : !storage.length && bad.length === 1 ? 'At least one storage location is required.' : 'Fill in the required fields (*).');
       }
       const d = new Date(), today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      const fields = { name, mgmt: v.mgmt, description: v.description.trim(), active: v.active === 'yes', addrName: v.addrName.trim(), line1: v.line1.trim(), line2: v.line2.trim(), line3: (v.line3 || '').trim(), city: v.city.trim(), town: '',
+      const fields = { name, mgmt: editing?.mgmt || 'OWN', description: v.description.trim(), active: v.active === 'yes', addrName: v.addrName.trim(), line1: v.line1.trim(), line2: v.line2.trim(), line3: (v.line3 || '').trim(), city: v.city.trim(), town: '',
         state: v.state, iso: v.iso.trim(), zip: v.zip.trim(), country: 'United States', attention: v.attention.trim(), email: v.email.trim(), storage, updatedBy: CURRENT_USER, updatedOn: today };
       if (editing) {
         const all = JSON.parse(localStorage.getItem(EDIT_LOC_KEY) || '{}');
