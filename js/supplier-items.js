@@ -196,7 +196,7 @@ function renderZero() {
       <h2>No stock balances shared yet</h2>
       <p>Upload a CSV file with the stock you hold for <b>${esc(state.customer)}</b>. Quantities must be in the item's order UoM or consumption UoM.</p>
       <div class="sl-zero-actions"><a class="cui-btn-secondary-sm" href="supplier-bulk-load.html?from=stock-location&${q}">Download template</a>
-        <a class="cui-btn-secondary-sm" href="supplier-bulk-load.html?from=stock-location&${q}">Load from file</a></div>
+        <a class="btn-primary-sm" href="supplier-bulk-load.html?from=stock-location&${q}">Load from file</a></div>
     </div>`);
 }
 function render() {

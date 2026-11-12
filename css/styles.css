@@ -779,3 +779,5 @@ textarea.se-in { padding: 6px; resize: none; }
 .cui-alert.is-warning .cui-alert-icon, .cui-alert.is-warning .cui-alert-title, .cui-alert.is-warning .cui-alert-desc, .cui-alert.is-warning .cui-alert-action { color: var(--cui-color-text-subtle-orange); }
 .cui-alert .cui-alert-action { align-self: center; padding: 0 var(--cui-space-lg); }
 .cui-alert .cui-alert-action:hover { background: var(--cui-color-s1-surface-hover); }
+.sl-zero-actions { align-items: center; }
+.sl-zero-actions .cui-btn-secondary-sm { height: 32px; font-size: var(--cui-font-size-sm); }
