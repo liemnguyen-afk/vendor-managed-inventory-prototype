@@ -48,13 +48,30 @@ function renderUploadStrip() {
       : ['info', `Next stock update required on ${fmtDate(due)} (${freq})`, lastLine];
   const action = IS_CSP ? `<a class="cui-alert-action" href="supplier-bulk-load.html?from=stock-location&customer=${encodeURIComponent(cust)}">Load from file</a>` : '';
   document.querySelector('.csp-card').insertAdjacentHTML('beforebegin', `
-    <div class="cui-alert ${severity} upload-strip" role="${severity === 'warning' ? 'alert' : 'status'}">
+    <div class="cui-alert is-${severity} upload-strip" role="${severity === 'warning' ? 'alert' : 'status'}">
       <span class="cui-alert-icon">${ALERT_ICON[severity]}</span>
       <div class="cui-alert-body"><p class="cui-alert-title">${title}</p>${description ? `<p class="cui-alert-desc">${description}</p>` : ''}</div>
       ${action}
     </div>`);
 }
 renderUploadStrip();
+
+// Success alert after a file upload (Clarity Alert · Standard · Positive, closable)
+function renderUploadSuccess() {
+  const f = IS_STOCK && IS_CSP && JSON.parse(sessionStorage.getItem('vmi.uploadFlash') || 'null');
+  if (!f) return;
+  sessionStorage.removeItem('vmi.uploadFlash');
+  const list = f.nums.slice(0, 5).map(esc).join(', ') + (f.nums.length > 5 ? ` and ${f.nums.length - 5} more` : '');
+  document.querySelector('.upload-strip, .csp-card').insertAdjacentHTML('beforebegin', `
+    <div class="cui-alert is-positive" role="status" id="upload-success">
+      <span class="cui-alert-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16 9.6"/></svg></span>
+      <div class="cui-alert-body"><p class="cui-alert-title">${f.count} item${f.count === 1 ? '' : 's'} uploaded from file</p>
+        <p class="cui-alert-desc">${esc(f.file)} was loaded for ${esc(f.customer)}. Inventory balance updated for ${list}.</p></div>
+      <button type="button" class="cui-alert-close" aria-label="Dismiss">×</button>
+    </div>`);
+  document.querySelector('#upload-success .cui-alert-close').addEventListener('click', e => e.currentTarget.closest('.cui-alert').remove());
+}
+renderUploadSuccess();
 
 const VIEWS = {
   'All': () => true,

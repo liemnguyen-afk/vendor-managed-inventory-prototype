@@ -707,9 +707,9 @@ textarea.se-in { padding: 6px; resize: none; }
 /* ---------------------------------------------------------------- Clarity 2 alert (CuiAlert, variant "standard") — upload status banner */
 .cui-alert { display: flex; align-items: flex-start; gap: var(--cui-space-lg); margin: 0 0 var(--cui-space-2xl); padding: var(--cui-space-lg) var(--cui-space-2xl);
   border-radius: var(--cui-radii-xs); background: var(--cui-color-status-infoSubtle); font-family: var(--cui-font-family-control); }
-.cui-alert.warning { background: var(--cui-color-status-warningSubtle); }
+.cui-alert.is-warning { background: var(--cui-color-status-warningSubtle); }
 .cui-alert-icon { flex: none; display: inline-flex; margin-top: 2px; color: var(--cui-color-status-infoBold); }
-.cui-alert.warning .cui-alert-icon { color: var(--cui-color-status-warningBold); }
+.cui-alert.is-warning .cui-alert-icon { color: var(--cui-color-status-warningBold); }
 .cui-alert-body { flex: 1; min-width: 0; }
 .cui-alert-body p { margin: 0; }
 .cui-alert-title { font-size: var(--cui-font-size-sm); line-height: var(--cui-font-lineHeight-2xs, 20px); font-weight: var(--cui-font-weight-bold); color: var(--cui-color-text-t1); }
@@ -736,3 +736,10 @@ textarea.se-in { padding: 6px; resize: none; }
 .c2divider { width: 100%; margin: 0; border: 0; border-top: 1px solid var(--cui-color-s1-border-decorative-b2); }
 .c2h4 { margin: 0 0 calc(-1 * var(--cui-space-md)); font: var(--cui-font-weight-bold) 20px/28px var(--cui-font-family-heading); color: var(--cui-color-text-t2); } /* heading/heading4 */
 .c2f.ro output { min-height: 24px; font-size: var(--cui-font-size-sm); font-weight: var(--cui-font-weight-regular); color: var(--cui-color-text-t1); }
+/* Positive alert (upload success) */
+.cui-alert.is-positive { background: var(--cui-color-tealSubtle-surface-rest); }
+.cui-alert.is-positive .cui-alert-icon, .cui-alert.is-positive .cui-alert-title, .cui-alert.is-positive .cui-alert-desc { color: var(--cui-color-text-subtle-green); }
+.cui-alert-close { flex: none; width: 28px; height: 28px; margin: -2px -6px 0 0; border: 0; border-radius: var(--cui-radii-2xs); background: none; cursor: pointer;
+  font: 20px/1 var(--cui-font-family-control); color: inherit; }
+.cui-alert.is-positive .cui-alert-close { color: var(--cui-color-text-subtle-green); }
+.cui-alert-close:hover { background: var(--cui-color-neutralMinimal-surface-hover); }

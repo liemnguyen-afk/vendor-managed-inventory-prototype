@@ -132,6 +132,12 @@
       const ok = results.filter(x => x.ok).map(x => x.ok), later = results.filter(x => x.error).map(x => x.error);
       saveBalances(customer, ok);
       recordUpload(customer, src.name, ok.length);
+      // Clean upload → back to Stock Balances with a success alert (Figma 286:7839). Partial uploads stay here so the errors are visible.
+      if (!later.length) {
+        sessionStorage.setItem('vmi.uploadFlash', JSON.stringify({ count: ok.length, file: src.name, customer, nums: ok.map(r => r.num) }));
+        location.href = `supplier-stock-location.html?customer=${encodeURIComponent(customer)}`;
+        return;
+      }
       box(later.length ? 'warn' : 'ok', `<b>Inventory balance loaded for ${ok.length} row${ok.length === 1 ? '' : 's'} from ${esc(src.name)}.</b>
         <ul>${ok.map(r => `<li>${esc(r.num)}: ${esc(r.note)}</li>`).join('')}</ul>
         ${later.length ? `<b>${later.length} row${later.length > 1 ? 's' : ''} weren't loaded:</b><ul>${later.map(m => `<li>${esc(m)}</li>`).join('')}</ul>` : ''}
