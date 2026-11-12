@@ -199,11 +199,11 @@ function render() {
   renderZero();
   const rows = visible();
   const span = COLS.length + (SHOW_ACTIONS ? 1 : 0);
-  document.getElementById('rows').innerHTML = rows.length ? rows.map(i => `<tr class="${state.editing === i.num ? 'editing' : ''}" data-num="${esc(i.num)}">
+  document.getElementById('rows').innerHTML = rows.length ? rows.map(i => `<tr class="${[state.editing === i.num ? 'editing' : '', i.active === false ? 'inactive' : ''].join(' ').trim()}" data-num="${esc(i.num)}">
       ${COLS.map(k => `<td class="${[C[k].cls, C[k].num ? 'num' : ''].filter(Boolean).join(' ')}">${EDITABLE && k in EDIT_FIELDS && state.editing === i.num ? editCell(i, k) : cellHtml(k, i)}</td>`).join('')}
       ${!SHOW_ACTIONS ? '' : EDITABLE ? `<td class="act">${state.editing === i.num
         ? `<button class="row-act cancel" data-edit="cancel" aria-label="Cancel editing ${esc(i.num)}">${ICO.cancel}</button><button class="row-act save" data-edit="save" aria-label="Save ${esc(i.num)}">${ICO.save}</button>`
-        : `<button class="row-act" data-edit="start" aria-label="Edit ${esc(i.num)}" ${state.editing ? 'disabled' : ''}>${ICO.pencil}</button>`}</td>`
+        : `<span class="row-acts"><button class="row-act" data-edit="start" aria-label="Edit ${esc(i.num)}" ${state.editing ? 'disabled' : ''}>${ICO.pencil}</button><button type="button" class="c2switch" role="switch" aria-checked="${i.active !== false}" data-active="${esc(i.num)}" ${state.editing ? 'disabled' : ''} aria-label="${i.active !== false ? 'Deactivate' : 'Activate'} ${esc(i.num)}" title="${i.active !== false ? 'Active — click to deactivate' : 'Inactive — click to activate'}"><span></span></button></span>`}</td>`
         : `<td><button class="row-act" aria-label="Actions for ${esc(i.num)}" aria-haspopup="menu">${KEBAB}</button></td>`}
     </tr>`).join('')
     : `<tr class="empty"><td colspan="${span}">No results found</td></tr>`;
@@ -318,6 +318,14 @@ document.getElementById('more-btn').addEventListener('click', e => {
 document.getElementById('rows').addEventListener('click', e => {
   const link = e.target.closest('.loc-link');
   if (link) { e.preventDefault(); toast(`Stock Location ${link.dataset.loc} — detail page isn't part of this prototype yet`); return; }
+  // Active / inactive switch (Stock Balances · Actions): saved as an override, stamps Last Updated By / Last Updated
+  const sw = e.target.closest('[data-active]');
+  if (sw) {
+    const i = itemsFor(state.customer).find(x => x.num === sw.dataset.active);
+    saveBalances(state.customer, [{ num: i.num, active: i.active === false }]);
+    render(); toast(`${i.num} ${i.name} is now ${i.active === false ? 'active' : 'inactive'}`);
+    return;
+  }
   const ed = e.target.closest('[data-edit]');
   if (ed) {
     const tr = ed.closest('tr');
