@@ -159,7 +159,25 @@ function focusEdit(field = 'atp') {
   if (inp) { inp.focus(); inp.select(); }
 }
 
+// Zero state (Figma 287:6471): the supplier hasn't shared any stock for this customer yet → primary action is a file upload
+function renderZero() {
+  const empty = IS_STOCK && IS_CSP && !itemsFor(state.customer).length;
+  const card = document.querySelector('.csp-card');
+  card.querySelector('.toolbar').hidden = empty;
+  card.querySelector('.table-scroll').hidden = empty;
+  card.querySelector('.sl-zero')?.remove();
+  if (!empty) return;
+  const q = `customer=${encodeURIComponent(state.customer)}`;
+  card.insertAdjacentHTML('beforeend', `<div class="sl-zero">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5h8l4.5 4.5v14.5h-12.5z"/><path d="M14 2.5V7h4.5M12 17.5v-6.5M9.3 13.5L12 10.8l2.7 2.7"/></svg>
+      <h2>No stock balances shared yet</h2>
+      <p>Upload a CSV file with the stock you hold for <b>${esc(state.customer)}</b>. Quantities must be in the item's order UoM or consumption UoM.</p>
+      <div class="sl-zero-actions"><a class="btn-outline-sm" href="supplier-bulk-load.html?from=stock-location&${q}">Download template</a>
+        <a class="btn-primary-sm" href="supplier-bulk-load.html?from=stock-location&${q}">Load from file</a></div>
+    </div>`);
+}
 function render() {
+  renderZero();
   const rows = visible();
   const span = COLS.length + (SHOW_ACTIONS ? 1 : 0);
   document.getElementById('rows').innerHTML = rows.length ? rows.map(i => `<tr class="${state.editing === i.num ? 'editing' : ''}" data-num="${esc(i.num)}">
