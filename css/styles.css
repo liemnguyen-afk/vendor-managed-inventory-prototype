@@ -748,3 +748,16 @@ textarea.se-in { padding: 6px; resize: none; }
 .c2col.two .span2 { grid-column: 1 / -1; }
 .c2col.two > [hidden] { display: none; }
 .c2col.two .c2link.start { justify-self: start; }
+/* Stock Locations · Actions: edit + Active switch (Clarity Switch, Small) */
+.items.wide.sl-table th.act, .items.wide.sl-table td.act { width: 120px; min-width: 120px; max-width: 120px; }
+.sl-acts { display: inline-flex; align-items: center; gap: var(--cui-space-sm); }
+.c2switch { position: relative; flex: none; width: 34px; height: 20px; padding: 0; border: 0; border-radius: var(--cui-radii-2xl); cursor: pointer;
+  background: var(--cui-color-text-t3); transition: background .15s; }
+.c2switch span { position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--cui-color-s1-surface-rest); transition: transform .15s; }
+.c2switch[aria-checked="true"] { background: var(--cui-color-primary-surface-rest); }
+.c2switch[aria-checked="true"] span { transform: translateX(14px); }
+.c2switch:focus-visible { outline: 2px solid var(--cui-color-primary-surface-rest); outline-offset: 2px; }
+/* Active radios: horizontal, beside Supplier Location Name (Figma 207:19585) */
+.c2f.radios.inline { display: grid; grid-template-columns: repeat(2, max-content); column-gap: var(--cui-space-4xl); align-content: start; }
+.c2f.radios.inline legend { grid-column: 1 / -1; float: left; width: 100%; }
+.c2f.radios.inline label { height: 40px; }

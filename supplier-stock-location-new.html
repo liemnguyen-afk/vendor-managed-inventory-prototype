@@ -16,13 +16,13 @@
         <h2>General</h2>
         <div class="c2grid">
           <label class="c2f"><span>Supplier Location Name <em>*</em></span><input name="name" maxlength="80" placeholder="e.g. Laughlin Nevada"></label>
+          <fieldset class="c2f radios inline"><legend>Active <em>*</em></legend>
+            <label><input type="radio" name="active" value="yes" checked> Yes</label>
+            <label><input type="radio" name="active" value="no"> No</label></fieldset>
+          <label class="c2f"><span>Supplier Location Description</span><textarea name="description" rows="3" placeholder="Describe this stock location"></textarea></label>
           <label class="c2f"><span>Supplier Stock Management Type <em>*</em></span>
             <select name="mgmt"><option value="OWN">OWN</option><option value="SCON">SCON</option></select>
             <small>OWN: supplier-owned stock. SCON: subcontracting stock received from the buyer for assembly; its consumption is tracked for this stock location.</small></label>
-          <label class="c2f"><span>Supplier Location Description</span><textarea name="description" rows="3" placeholder="Describe this stock location"></textarea></label>
-          <fieldset class="c2f radios"><legend>Active <em>*</em></legend>
-            <label><input type="radio" name="active" value="yes" checked> Yes</label>
-            <label><input type="radio" name="active" value="no"> No</label></fieldset>
         </div>
       </section>
 
