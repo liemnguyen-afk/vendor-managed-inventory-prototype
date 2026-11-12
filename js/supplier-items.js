@@ -45,7 +45,7 @@ function renderUploadStrip() {
     ? ['warning', 'No stock file uploaded yet', `${IS_CSP ? `Share your stock levels with ${esc(cust)}.` : `${esc(SUPPLIER_NAME)} hasn't shared stock levels yet.`} Update frequency: ${freq}.`]
     : overdue
       ? ['warning', `Stock update overdue — was required on ${fmtDate(due)} (${freq})`, lastLine]
-      : ['info', `Next stock update required on ${fmtDate(due)} (${freq})`, lastLine];
+      : ['info', `Next stock update suggested by ${fmtDate(due)} (${freq})`, lastLine];
   const action = IS_CSP ? `<a class="cui-alert-action" href="supplier-bulk-load.html?from=stock-location&customer=${encodeURIComponent(cust)}">Load from file</a>` : '';
   document.querySelector('.csp-card').insertAdjacentHTML('beforebegin', `
     <div class="cui-alert is-${severity} upload-strip" role="${severity === 'warning' ? 'alert' : 'status'}">
