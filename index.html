@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <title>Vendor Managed Inventory prototype</title>
   <!-- Start page: the Supplier Portal Stock Location tab -->
-  <meta http-equiv="refresh" content="0; url=supplier-stock-location.html">
-  <script>location.replace('supplier-stock-location.html' + location.search + location.hash);</script>
+  <meta http-equiv="refresh" content="0; url=supplier-stock-location.html?customer=Buyer%20Demo%20Company">
+  <script>location.replace('supplier-stock-location.html' + (location.search || '?customer=Buyer%20Demo%20Company') + location.hash);</script>
 </head>
 <body>
-  <p><a href="supplier-stock-location.html">Open the Vendor Managed Inventory prototype (Stock Location)</a></p>
+  <p><a href="supplier-stock-location.html?customer=Buyer%20Demo%20Company">Open the Vendor Managed Inventory prototype (Stock Location)</a></p>
 </body>
 </html>

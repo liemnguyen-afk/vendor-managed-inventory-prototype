@@ -21,12 +21,12 @@ const PROTO_SCREENS = [   // mirrors the Figma flow on page "Vendor Managed Inve
     ['supplier-edit.html', 'Supplier Profile — Update frequency'],
   ]],
   ['2 · CSP – Supplier Stock Levels (Ines Ellis, Northwind Supply Co.)', [
-    ['supplier-stock-locations.html', 'Stock Locations'],
+    ['supplier-stock-locations.html?customer=Buyer%20Demo%20Company', 'Stock Locations (populated)'],
     ['supplier-stock-locations.html?customer=Coupa%20Demo%20Co', 'Stock Locations — zero state'],
-    ['supplier-stock-location-new.html', 'Create Stock Location'],
-    ['supplier-stock-location.html', 'Stock Balances (inline edit)'],
+    ['supplier-stock-location-new.html?customer=Buyer%20Demo%20Company', 'Create Stock Location'],
+    ['supplier-stock-location.html?customer=Buyer%20Demo%20Company', 'Stock Balances (populated · inline edit)'],
     ['supplier-stock-location.html?customer=Coupa%20Demo%20Co', 'Stock Balances — zero state'],
-    ['supplier-bulk-load.html?from=stock-location', 'Bulk Load Inventory Balance'],
+    ['supplier-bulk-load.html?from=stock-location&customer=Buyer%20Demo%20Company', 'Bulk Load Inventory Balance'],
   ]],
   ['3 · Enterprise – On-Hand Balances (Buyer Demo Company)', [
     ['ohb.html', 'On-Hand Balances'],
@@ -55,12 +55,15 @@ function renderProtoNav() {
   if (document.querySelector('.proto-nav')) return;
   const here = location.pathname.split('/').pop() || 'index.html';
   const other = PROTO_COUNTERPART[here];
+  // same page listed twice (populated / zero state): match on ?customer= too
+  const curCust = new URLSearchParams(location.search).get('customer') || sessionStorage.getItem('vmi.cspCustomer');
+  const isHere = href => { const [f, q] = href.split('?'); if (f !== here) return false; const c = new URLSearchParams(q || '').get('customer'); return !c || !curCust || c === curCust; };
   document.body.insertAdjacentHTML('beforeend', `
   <div class="proto-nav">
     <div class="panel" id="proto-panel" role="dialog" aria-label="Prototype navigator">
       ${other ? `<a class="switch" href="${other[0]}">⇄ ${esc(other[1])}</a>` : ''}
       ${PROTO_SCREENS.map(([group, items]) => `<h4>${esc(group)}</h4>${items.map(([href, label]) =>
-        `<a href="${href}" class="${href.split('?')[0] === here ? 'here' : ''}" ${href.split('?')[0] === here ? 'aria-current="page"' : ''}>${esc(label)}</a>`).join('')}`).join('')}
+        { const on = isHere(href); return `<a href="${href}" class="${on ? 'here' : ''}" ${on ? 'aria-current="page"' : ''}>${esc(label)}</a>`; }).join('')}`).join('')}
       <h4>Data</h4>
       <button type="button" data-proto-reset>Reset sample data</button>
     </div>
