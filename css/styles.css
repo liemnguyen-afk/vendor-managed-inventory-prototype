@@ -763,3 +763,19 @@ textarea.se-in { padding: 6px; resize: none; }
 .items.wide.sb-table th.act, .items.wide.sb-table td.act { width: 122px; min-width: 122px; max-width: 122px; }
 .items tr.inactive td:not(.act) { color: var(--cui-color-text-t3); }
 .c2switch:disabled { opacity: .4; cursor: not-allowed; }
+
+/* Clarity Button · Secondary · Outline · Small (Figma Alert action / Load from file) */
+.cui-btn-secondary-sm { display: inline-flex; align-items: center; justify-content: center; height: 28px; padding: 0 var(--cui-space-lg); box-sizing: border-box;
+  border: 1px solid var(--cui-color-s1-border-decorative-b2); border-radius: var(--cui-radii-xs); background: var(--cui-color-s1-surface-rest);
+  font: var(--cui-font-weight-semiBold) var(--cui-font-size-2xs)/1 var(--cui-font-family-control); color: var(--cui-color-text-t1); text-decoration: none !important; white-space: nowrap; cursor: pointer; }
+.cui-btn-secondary-sm:hover { background: var(--cui-color-s1-surface-hover); }
+/* Alert · Standard (Figma 41:1075 / 293:7685): 16px padding, 4px radius, severity-coloured title + description */
+.cui-alert { padding: var(--cui-space-2xl); border-radius: var(--cui-radii-2xs); align-items: flex-start; }
+.cui-alert-title { font-size: 16px; line-height: 22px; }
+.cui-alert-desc { margin-top: var(--cui-space-sm) !important; font-size: var(--cui-font-size-sm); }
+.cui-alert.is-info { background: var(--cui-color-primarySubtle-surface-rest); }
+.cui-alert.is-info .cui-alert-icon, .cui-alert.is-info .cui-alert-title, .cui-alert.is-info .cui-alert-desc { color: var(--cui-color-text-subtle-brand); }
+.cui-alert.is-warning { background: var(--cui-color-orangeSubtle-surface-rest); }
+.cui-alert.is-warning .cui-alert-icon, .cui-alert.is-warning .cui-alert-title, .cui-alert.is-warning .cui-alert-desc, .cui-alert.is-warning .cui-alert-action { color: var(--cui-color-text-subtle-orange); }
+.cui-alert .cui-alert-action { align-self: center; padding: 0 var(--cui-space-lg); }
+.cui-alert .cui-alert-action:hover { background: var(--cui-color-s1-surface-hover); }

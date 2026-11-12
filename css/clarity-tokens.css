@@ -21,6 +21,8 @@
   --cui-color-text-critical: #e70848;
   --cui-color-text-subtle-red: #a80539;
   --cui-color-text-subtle-brand: #0342b0;
+  --cui-color-text-subtle-orange: #855103; /* Figma Alert · Warning text/icon */
+  --cui-color-orangeSubtle-surface-rest: #ffe5c8;
 
   /* Surfaces */
   --cui-color-s1-surface-rest: #ffffff;

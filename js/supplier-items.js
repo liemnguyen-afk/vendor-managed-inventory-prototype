@@ -33,8 +33,8 @@ if (!IS_CSP) document.querySelector('.csp-main h1').insertAdjacentHTML('afterend
 // Last upload + next update due (supplier profile frequency) — Stock Balances and Vendor Stock Balances
 // Upload status as a Clarity 2 alert (CuiAlert anatomy: severity icon · title · description · endSlot action)
 const ALERT_ICON = {
-  info: '<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor"/><path d="M12 11v5.5M12 7.5v.2" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>',
-  warning: '<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 3.6a2 2 0 013.4 0l8.3 14.3A2 2 0 0120.3 21H3.7A2 2 0 012 17.9z" fill="currentColor"/><path d="M12 9v5M12 17.2v.2" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>',
+  info: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.6v.2"/></svg>',
+  warning: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.4 4.2a1.8 1.8 0 013.2 0l7.7 13.6a1.8 1.8 0 01-1.6 2.7H4.3a1.8 1.8 0 01-1.6-2.7z"/><path d="M12 9.5v4.2M12 16.8v.2"/></svg>',
 };
 function renderUploadStrip() {
   if (!IS_STOCK) return;
@@ -49,7 +49,7 @@ function renderUploadStrip() {
     : overdue
       ? ['warning', `Stock update overdue — was required on ${fmtDate(due)} (${freq})`, lastLine]
       : ['info', `Next stock update suggested by ${fmtDate(due)} (${freq})`, lastLine];
-  const action = IS_CSP ? `<a class="cui-alert-action" href="supplier-bulk-load.html?from=stock-location&customer=${encodeURIComponent(cust)}">Load from file</a>` : '';
+  const action = IS_CSP ? `<a class="cui-btn-secondary-sm cui-alert-action" href="supplier-bulk-load.html?from=stock-location&customer=${encodeURIComponent(cust)}">Load from file</a>` : '';
   document.querySelector('.csp-card').insertAdjacentHTML('beforebegin', `
     <div class="cui-alert is-${severity} upload-strip" role="${severity === 'warning' ? 'alert' : 'status'}">
       <span class="cui-alert-icon">${ALERT_ICON[severity]}</span>
@@ -195,8 +195,8 @@ function renderZero() {
       <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5h8l4.5 4.5v14.5h-12.5z"/><path d="M14 2.5V7h4.5M12 17.5v-6.5M9.3 13.5L12 10.8l2.7 2.7"/></svg>
       <h2>No stock balances shared yet</h2>
       <p>Upload a CSV file with the stock you hold for <b>${esc(state.customer)}</b>. Quantities must be in the item's order UoM or consumption UoM.</p>
-      <div class="sl-zero-actions"><a class="btn-outline-sm" href="supplier-bulk-load.html?from=stock-location&${q}">Download template</a>
-        <a class="btn-primary-sm" href="supplier-bulk-load.html?from=stock-location&${q}">Load from file</a></div>
+      <div class="sl-zero-actions"><a class="cui-btn-secondary-sm" href="supplier-bulk-load.html?from=stock-location&${q}">Download template</a>
+        <a class="cui-btn-secondary-sm" href="supplier-bulk-load.html?from=stock-location&${q}">Load from file</a></div>
     </div>`);
 }
 function render() {
