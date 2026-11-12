@@ -63,6 +63,10 @@ function recordUpload(customer, file, rows) {
   all[customer] = { on: `${now.getFullYear()}-${p(now.getMonth() + 1)}-${p(now.getDate())}T${p(now.getHours())}:${p(now.getMinutes())}`, by: CURRENT_USER, file, rows };
   localStorage.setItem(UPLOAD_KEY, JSON.stringify(all));
 }
+function nextDueFrom(dateTime, customer) {
+  const d = new Date(dateTime.slice(0, 10) + 'T00:00'); d.setDate(d.getDate() + FREQ_DAYS[UPLOAD_FREQUENCY[customer] || 'Weekly']);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
 function nextUploadDue(customer) {
   const u = lastUpload(customer); if (!u) return null;
   const d = new Date(u.on.slice(0, 10) + 'T00:00'); d.setDate(d.getDate() + FREQ_DAYS[UPLOAD_FREQUENCY[customer] || 'Weekly']);

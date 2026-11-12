@@ -99,8 +99,10 @@ const C = {
   aisle: { label: 'Aisle' }, bin: { label: 'Bin' }, level: { label: 'Level' },
   createdOn: { label: 'Created On', html: i => fmtDateTime(i.createdOn), csv: i => fmtDateTime(i.createdOn) },
   createdBy: { label: 'Created By' },
-  updatedBy: { label: 'Updated By' },
+  updatedBy: { label: 'Last Updated By' },
   updatedOn: { label: 'Last Updated', html: i => fmtDateTime(i.updatedOn), csv: i => fmtDateTime(i.updatedOn) },
+  // Last Updated + the customer's update frequency (Supplier Profile → Update frequency)
+  nextDue: { label: 'Next Update Required', html: i => fmtDate(nextDueFrom(i.updatedOn, state.customer)), csv: i => fmtDate(nextDueFrom(i.updatedOn, state.customer)), sortVal: i => i.updatedOn },
   price: { label: 'Unit Price', num: true, html: i => money(i.price), csv: i => i.price.toFixed(2) },
   value: { label: 'Stock Value', num: true, html: i => money(i.value), csv: i => i.value.toFixed(2) },
   currency: { label: 'Currency', html: () => 'USD', csv: () => 'USD' },
@@ -109,8 +111,8 @@ const C = {
 if (CFG.cols === 'ohb') { C.qoh.label = 'Qty'; C.reserved.label = 'Allocated'; C.atp.label = 'Available'; }
 const COL_SETS = {
   'csp-items': ['num', 'name', 'warehouse', 'qoh', 'reserved', 'atp', 'counted', 'aisle', 'bin', 'level'],
-  stock: ['num', 'name', 'warehouse', 'ouom', 'atp', 'incoming', 'counted', 'aisle', 'bin', 'level', 'createdOn', 'createdBy', 'updatedBy', 'updatedOn'],
-  vendor: ['num', 'name', 'supplier', 'warehouse', 'ouom', 'atp', 'incoming', 'openPo', 'counted', 'aisle', 'bin', 'level', 'createdOn', 'createdBy', 'updatedBy', 'updatedOn'],
+  stock: ['num', 'name', 'warehouse', 'ouom', 'atp', 'incoming', 'counted', 'aisle', 'bin', 'level', 'createdOn', 'createdBy', 'updatedBy', 'updatedOn', 'nextDue'],
+  vendor: ['num', 'name', 'supplier', 'warehouse', 'ouom', 'atp', 'incoming', 'openPo', 'counted', 'aisle', 'bin', 'level', 'createdOn', 'createdBy', 'updatedBy', 'updatedOn', 'nextDue'],
   ohb: ['num', 'name', 'warehouse', 'qoh', 'reserved', 'atp', 'ouom', 'price', 'value', 'currency', 'aisle', 'bin', 'level'],
 };
 const COLS = COL_SETS[CFG.cols];
