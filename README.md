@@ -4,7 +4,7 @@ A static, clickable prototype of **Vendor Managed Inventory**.
 
 **▶ View the live prototype: https://liemnguyen-afk.github.io/vendor-managed-inventory-prototype/**
 
-To run it locally, open [`index.html`](index.html) — it opens the Supplier Portal **Stock Levels → Stock Balances** page.
+To run it locally, open [`index.html`](index.html) — it opens the buyer's **Setup → Inventory Settings** page, the first step of the flow.
 
 No build step: plain HTML, CSS and JavaScript.
 

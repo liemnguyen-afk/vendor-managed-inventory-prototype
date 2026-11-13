@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <title>Vendor Managed Inventory prototype</title>
-  <!-- Start page: the Supplier Portal Stock Location tab -->
-  <meta http-equiv="refresh" content="0; url=supplier-stock-location.html?customer=Buyer%20Demo%20Company">
-  <script>location.replace('supplier-stock-location.html' + (location.search || '?customer=Buyer%20Demo%20Company') + location.hash);</script>
+  <!-- Start page: step 1 of the flow — the buyer's Setup → Inventory Settings (Allow Vendor Managed Inventory) -->
+  <meta http-equiv="refresh" content="0; url=inventory-settings.html">
+  <script>location.replace('inventory-settings.html' + location.search + location.hash);</script>
 </head>
 <body>
-  <p><a href="supplier-stock-location.html?customer=Buyer%20Demo%20Company">Open the Vendor Managed Inventory prototype (Stock Location)</a></p>
+  <p><a href="inventory-settings.html">Open the Vendor Managed Inventory prototype (Inventory Settings)</a></p>
 </body>
 </html>
